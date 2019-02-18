@@ -41,17 +41,17 @@ def load_dataset(args):
     
     def select_to_ds(indices):
         return tf.data.Dataset.from_tensor_slices((
-            all_image_paths.iloc[indices].values, 
-            all_image_labels.iloc[indices].values
+            all_image_paths.loc[indices].values, 
+            all_image_labels[indices].values
         ))
 
     def load_cache(ds, f):
-        print(ds)
-        return ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=f)
+        return ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache()#filename=f)
 
     X_train = []
+    labels_train = all_image_labels[train_indices]
     for i in range(args.noc):
-        indices = np.where(all_image_labels[train_indices] == i)[0]
+        indices = labels_train.index[labels_train == i]
         X_train.append(select_to_ds(indices).apply(
             tf.data.experimental.shuffle_and_repeat(buffer_size=len(indices))
         ))
@@ -94,7 +94,6 @@ if __name__ == "__main__":
             print(Counter(labels.numpy()))
         print()
         end = time.time()
-        break
 
     duration = end-start
     print("{} batches: {} s".format(batches, duration))
