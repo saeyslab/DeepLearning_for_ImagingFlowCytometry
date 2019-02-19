@@ -1,5 +1,4 @@
 import tensorflow as tf
-import pandas as pd
 import time
 from pathlib import Path
 import numpy as np
@@ -25,49 +24,53 @@ def load_and_preprocess_images(paths, args):
         dtype=tf.float32
     )
 
-def load_dataset(args):
-    meta = pd.read_csv(args.meta)
-    train_indices = np.loadtxt(Path(args.split_dir, "train.txt"), dtype=int)
-    val_indices = np.loadtxt(Path(args.split_dir, "val.txt"), dtype=int)
-    steps_per_epoch = int(np.ceil(len(train_indices)/args.batch_size))
-    validation_steps = int(np.ceil(len(val_indices)/args.batch_size))
+def load_dataset(indices_file, cache_file, meta, args, train):
 
+    indices = np.loadtxt(indices_file, dtype=int)
+    meta = meta.iloc[indices]
+
+    steps = int(np.ceil(len(indices)/args.batch_size))
     image_columns = ["image_%s" % str(c) for c in args.channels]
+
     all_image_paths = meta[image_columns].applymap(lambda path: str(Path(args.image_base, path)))
     all_image_labels = meta["label"]
-
-    def batch_prefetch(ds):
-        return ds.batch(args.batch_size).prefetch(buffer_size=args.batch_size*2)
     
-    def select_to_ds(indices):
-        return tf.data.Dataset.from_tensor_slices((
-            all_image_paths.loc[indices].values, 
-            all_image_labels[indices].values
+    if train:
+        X = []
+        for i in range(args.noc):
+            indices = all_image_labels.index[all_image_labels == i]
+            X.append(
+                tf.data.Dataset.from_tensor_slices((
+                    all_image_paths.loc[indices].values, 
+                    all_image_labels.loc[indices].values
+                ))
+                .map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4)
+                .cache(filename=cache_file+"-%d" % i)
+                .apply(
+                    tf.data.experimental.shuffle_and_repeat(buffer_size=len(indices))
+                )
+            )
+        ds = tf.data.experimental.sample_from_datasets(X)
+        ds = ds.batch(args.batch_size, drop_remainder=True).prefetch(buffer_size=args.batch_size*2)
+    else:
+        ds = tf.data.Dataset.from_tensor_slices((
+            all_image_paths.values, 
+            all_image_labels.values
         ))
+        ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=cache_file)
+        ds = ds.apply(
+            tf.data.experimental.shuffle_and_repeat(buffer_size=all_image_labels.shape[0])
+        )
+        ds = ds.batch(args.batch_size, drop_remainder=True).prefetch(buffer_size=args.batch_size*2)
 
-    def load_cache(ds, f):
-        return ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache()#filename=f)
+    return ds, steps 
 
-    X_train = []
-    labels_train = all_image_labels[train_indices]
-    for i in range(args.noc):
-        indices = labels_train.index[labels_train == i]
-        X_train.append(select_to_ds(indices).apply(
-            tf.data.experimental.shuffle_and_repeat(buffer_size=len(indices))
-        ))
 
-    train_ds = tf.data.experimental.sample_from_datasets(X_train)
-    train_ds = load_cache(train_ds, "./caches/tf-train-2.cache")
+def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args):
+    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, True)
+    val_ds, val_steps = load_dataset(val_indices, val_cache, meta, args, False)
 
-    val_ds = select_to_ds(val_indices)
-    val_ds = load_cache(val_ds, "./caches/tf-val.cache").repeat()
-
-    return (
-        batch_prefetch(train_ds), 
-        batch_prefetch(val_ds),
-        steps_per_epoch,
-        validation_steps
-    )
+    return train_ds, val_ds, train_steps, val_steps
 
 
 if __name__ == "__main__":
@@ -75,10 +78,15 @@ if __name__ == "__main__":
 
     from collections import Counter
     import arguments
-    args = arguments.get_args()
+    from pathlib import Path
+    import pandas as pd
 
-    ds, _, _, _ = load_dataset(args)
+    args = arguments.get_args()
     meta = pd.read_csv(args.meta)
+    train_indices = Path(args.split_dir, "val.txt")
+    train_cache = str(Path("caches", "test"))
+
+    ds, _ = load_dataset(train_indices, train_cache, meta, args, False)
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),

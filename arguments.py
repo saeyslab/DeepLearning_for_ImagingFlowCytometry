@@ -13,11 +13,15 @@ def get_args():
     parser.add_argument("--meta", type=str)
     parser.add_argument("--image_base", type=str)
     parser.add_argument("--split_dir", type=str)
+    parser.add_argument("--run_dir", type=str)
+    parser.add_argument("--epochs", type=int)
 
     # default
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--image_width", type=int, default=90)
     parser.add_argument("--image_height", type=int, default=90)
+    parser.add_argument("--update_freq", type=int, default=300)
+    parser.add_argument("--freq_type", type=str, default="batch")
 
     args = parser.parse_args()
 

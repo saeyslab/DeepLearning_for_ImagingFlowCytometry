@@ -2,3 +2,5 @@ tensorflow-gpu
 numpy
 pandas
 scikit-learn
+tabulate
+tqdm
