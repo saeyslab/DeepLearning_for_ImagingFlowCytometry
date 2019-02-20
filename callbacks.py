@@ -84,7 +84,7 @@ class ValidationMonitor(keras.callbacks.Callback):
 
     def on_train_end(self, logs):
         if self.args.function == "cv":
-            p = Path(self.args.run_dir, "fold-%d_scores.npy" % self.fold)
+            p = Path(self.args.run_dir, "fold_scores.npy")
             if p.exists():
                 d = np.load(p)
                 d["max_cm"].append(self.max_cm)
