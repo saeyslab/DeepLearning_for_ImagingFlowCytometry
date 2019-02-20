@@ -24,18 +24,17 @@ def load_and_preprocess_images(paths, args):
         dtype=tf.float32
     )
 
-def load_dataset(indices_file, cache_file, meta, args, train):
+def load_dataset(indices_file, cache_file, meta, args, type="train"):
 
     indices = np.loadtxt(indices_file, dtype=int)
     meta = meta.iloc[indices]
 
-    steps = int(np.ceil(len(indices)/args.batch_size))
     image_columns = ["image_%s" % str(c) for c in args.channels]
 
     all_image_paths = meta[image_columns].applymap(lambda path: str(Path(args.image_base, path)))
     all_image_labels = meta["label"]
     
-    if train:
+    if type=="train":
         X = []
         for i in range(args.noc):
             indices = all_image_labels.index[all_image_labels == i]
@@ -44,31 +43,29 @@ def load_dataset(indices_file, cache_file, meta, args, train):
                     all_image_paths.loc[indices].values, 
                     all_image_labels.loc[indices].values
                 ))
-                .map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4)
-                .cache(filename=cache_file+"-%d" % i)
-                .apply(
-                    tf.data.experimental.shuffle_and_repeat(buffer_size=len(indices))
-                )
+                .shuffle(buffer_size=len(indices))
+                .map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=8)
+                .cache()
+                .repeat()
             )
-        ds = tf.data.experimental.sample_from_datasets(X)
-        ds = ds.batch(args.batch_size, drop_remainder=True).prefetch(buffer_size=args.batch_size*2)
-    else:
+        ds = tf.data.experimental.sample_from_datasets(X).repeat()
+        ds = ds.batch(args.batch_size).prefetch(buffer_size=1)
+    elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
             all_image_paths.values, 
             all_image_labels.values
         ))
         ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=cache_file)
-        ds = ds.apply(
-            tf.data.experimental.shuffle_and_repeat(buffer_size=all_image_labels.shape[0])
-        )
-        ds = ds.batch(args.batch_size, drop_remainder=True).prefetch(buffer_size=args.batch_size*2)
+        ds = ds.batch(args.batch_size).prefetch(buffer_size=1)
+    else:
+        raise RuntimeError("Wrong argument value (%s)" % type)
 
-    return ds, steps 
+    return ds, meta.shape[0] 
 
 
 def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args):
-    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, True)
-    val_ds, val_steps = load_dataset(val_indices, val_cache, meta, args, False)
+    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, "train")
+    val_ds, val_steps = load_dataset(val_indices, val_cache, meta, args, "val")
 
     return train_ds, val_ds, train_steps, val_steps
 
@@ -86,20 +83,19 @@ if __name__ == "__main__":
     train_indices = Path(args.split_dir, "val.txt")
     train_cache = str(Path("caches", "test"))
 
-    ds, _ = load_dataset(train_indices, train_cache, meta, args, False)
+    ds, _ = load_dataset(train_indices, train_cache, meta, args, "train")
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
     # before starting the timer
-    batches = 2*tf.ceil(meta.shape[0]/args.batch_size).numpy()+1
+    batches = 2*np.ceil(meta.shape[0]/args.batch_size)+1
     it = iter(ds.take(batches+1))
     next(it)
 
     start = time.time()
     for i,(images,labels) in enumerate(it):
         if (i%10 == 0):
-            print('.',end='')
-            print(Counter(labels.numpy()))
+            print('.', end='')
         print()
         end = time.time()
 

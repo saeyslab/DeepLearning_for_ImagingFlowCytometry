@@ -9,9 +9,9 @@ from tqdm import tqdm
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, steps, logfile, args):
+    def __init__(self, ds, ds_size, logfile, args):
         self.ds = ds
-        self.steps = steps
+        self.ds_size = ds_size
         self.log = open(logfile, mode="wt", buffering=1)
         self.max = None
         self.max_cm = None
@@ -19,29 +19,37 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.batch = 0
         self.args = args
         self.fold = None
+        self.metrics = []
 
     def set_fold(self, fold):
         self.fold = fold
         self.log.write("TRAINING FOLD %d\n" % self.fold)
 
     def do(self):
-        bs = self.args.batch_size
 
-        all_labels = np.empty((self.steps*bs,), dtype=int)
-        all_preds = np.empty((self.steps*bs,), dtype=int)
+        all_labels = np.empty((self.ds_size,), dtype=int)
+        all_preds = np.empty((self.ds_size,), dtype=int)
 
         print()
-        for i, (image_batch, label_batch) in tqdm(enumerate(iter(self.ds)), total=self.steps-1):
+        print()
+
+        pos = 0
+        for image_batch, label_batch in tqdm(iter(self.ds), total=np.ceil(self.ds_size/self.args.batch_size)):
             preds = self.model.predict_on_batch(image_batch)
-            all_labels[i*bs:(i+1)*bs] = label_batch
-            all_preds[i*bs:(i+1)*bs] = np.max(preds, axis=1)
-            if self.steps == i+1:
-                break
+            l = preds.shape[0]
+            all_labels[pos:pos+l] = label_batch
+            all_preds[pos:pos+l] = np.argmax(preds, axis=1)
+
+            pos += l
+        print()
         print()
 
         self.log.write("Epoch: %d, batch: %d\n" % (self.epoch, self.batch))
         
         bal_acc = sklearn.metrics.balanced_accuracy_score(all_labels, all_preds)
+
+        self.metrics.append(bal_acc)
+
         cm = sklearn.metrics.confusion_matrix(all_labels, all_preds)
         if self.max is None or bal_acc > self.max:
             self.log.write("NEW MAX\n")
@@ -78,11 +86,12 @@ class ValidationMonitor(keras.callbacks.Callback):
         if self.args.function == "cv":
             p = Path(self.args.run_dir, "fold-%d_scores.npy" % self.fold)
             if p.exists():
-                arr = np.load(p)
-                arr.append(self.max_cm)
+                d = np.load(p)
+                d["max_cm"].append(self.max_cm)
+                d["metrics"].append(self.metrics)
             else:
-                arr = [self.max_cm]
-            np.save(p, arr)
+                d = {"max_cm": [self.max_cm], "metrics": [self.metrics]}
+            np.save(p, d)
         elif self.args.function == "train":
             p = Path(self.args.run_dir, "max_scores.npy")
             np.save(p, [self.max_cm])

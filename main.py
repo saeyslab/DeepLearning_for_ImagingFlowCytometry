@@ -9,6 +9,7 @@ import metrics
 from pathlib import Path
 import shutil
 import pandas as pd
+import numpy as np
 
 def main():
     
@@ -31,7 +32,7 @@ def main():
     )
 
     def train(split=args.split_dir, run=args.run_dir, id_=100):
-        train_ds, val_ds, steps_per_epoch, validation_steps = preprocessing.load_datasets(
+        train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
             Path(split, "train.txt"), Path(split, "val.txt"),
             "caches/train-%d" % id_, "caches/val-%d" % id_,
             meta, args
@@ -40,14 +41,14 @@ def main():
         cb = [
             tf_callbacks.ModelCheckpoint(str(Path(run, "{epoch:02d}-model.hdf5")), verbose=0, period=1),
             tf_callbacks.TensorBoard(log_dir=run, histogram_freq=0, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True),
-            my_callbacks.ValidationMonitor(val_ds, validation_steps, Path(run, "scores.log"), args)
+            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args)
         ]
         cb[-1].set_fold(id_)
         
         m.fit(
             train_ds,
             epochs=args.epochs, 
-            steps_per_epoch=20,#steps_per_epoch,
+            steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
             callbacks=cb
         )
 
@@ -59,9 +60,7 @@ def main():
             if fold.is_dir():
                 run = Path(args.run_dir, str(fold).split(sep)[-1])
                 Path(run).mkdir()
-                # train and validate fold
                 train(fold, run, i)
-                # flush dataset
 
     if args.function == "train":
         train()
