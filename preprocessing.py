@@ -70,6 +70,11 @@ def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args
     return train_ds, val_ds, train_steps, val_steps
 
 
+def augment(ds, args):
+    # TODO: apply transformations
+
+    return ds
+
 if __name__ == "__main__":
     tf.enable_eager_execution()
 
@@ -84,6 +89,7 @@ if __name__ == "__main__":
     train_cache = str(Path("caches", "test"))
 
     ds, _ = load_dataset(train_indices, train_cache, meta, args, "train")
+    ds = augment(ds, args)
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
