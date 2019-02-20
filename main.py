@@ -39,8 +39,9 @@ def main():
             meta, args
         )
 
-        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=0, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
-        
+        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
+        tb.set_model(m)
+
         cb = [
             tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
             tb,
@@ -54,7 +55,8 @@ def main():
             callbacks=cb
         )
 
-        pickle.dump(hist.history, Path(run, "train-history.pkl"))
+        with open(Path(run, "train-history.pkl"), "wb") as pickle_file:
+            pickle.dump(hist.history, pickle_file)
 
 
     def cv():
