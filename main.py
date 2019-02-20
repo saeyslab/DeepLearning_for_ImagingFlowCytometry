@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import pandas as pd
 import numpy as np
+import pickle
 
 def main():
     
@@ -37,20 +38,24 @@ def main():
             "caches/train-%d" % id_, "caches/val-%d" % id_,
             meta, args
         )
+
+        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=0, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
         
         cb = [
-            tf_callbacks.ModelCheckpoint(str(Path(run, "{epoch:02d}-model.hdf5")), verbose=0, period=1),
-            tf_callbacks.TensorBoard(log_dir=run, histogram_freq=0, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True),
-            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args)
+            tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
+            tb,
+            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, tb.writer, id_)
         ]
-        cb[-1].set_fold(id_)
         
-        m.fit(
+        hist = m.fit(
             train_ds,
             epochs=args.epochs, 
             steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
             callbacks=cb
         )
+
+        pickle.dump(hist.history, Path(run, "train-history.pkl"))
+
 
     def cv():
         from os import sep

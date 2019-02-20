@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args):
+    def __init__(self, ds, ds_size, logfile, args, writer, fold):
         self.ds = ds
         self.ds_size = ds_size
         self.log = open(logfile, mode="wt", buffering=1)
@@ -18,11 +18,10 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.epoch = 0
         self.batch = 0
         self.args = args
-        self.fold = None
-        self.metrics = []
-
-    def set_fold(self, fold):
         self.fold = fold
+        self.metrics = []
+        self.writer = writer
+
         self.log.write("TRAINING FOLD %d\n" % self.fold)
 
     def do(self):
@@ -41,6 +40,7 @@ class ValidationMonitor(keras.callbacks.Callback):
             all_preds[pos:pos+l] = np.argmax(preds, axis=1)
 
             pos += l
+
         print()
         print()
 
