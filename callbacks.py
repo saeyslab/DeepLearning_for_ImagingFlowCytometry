@@ -86,7 +86,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         if self.args.function == "cv":
             p = Path(self.args.run_dir, "fold_scores.npy")
             if p.exists():
-                d = np.load(p)
+                d = np.load(p).item()
                 d["max_cm"].append(self.max_cm)
                 d["metrics"].append(self.metrics)
             else:
