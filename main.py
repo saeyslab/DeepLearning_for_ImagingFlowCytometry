@@ -50,7 +50,7 @@ def main():
         m.fit(
             train_ds,
             epochs=args.epochs, 
-            steps_per_epoch=20,#int(np.ceil(train_len/args.batch_size)),
+            steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
             callbacks=cb
         )
 
@@ -64,6 +64,8 @@ def main():
                 run = Path(args.run_dir, str(fold).split(sep)[-1])
                 Path(run).mkdir()
                 train(fold, run, i)
+
+        
 
     if args.function == "train":
         train()
