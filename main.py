@@ -40,23 +40,19 @@ def main():
         )
 
         tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
-        tb.set_model(m)
 
         cb = [
             tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
             tb,
-            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, tb.writer, id_)
+            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
         
-        hist = m.fit(
+        m.fit(
             train_ds,
             epochs=args.epochs, 
-            steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
+            steps_per_epoch=20,#int(np.ceil(train_len/args.batch_size)),
             callbacks=cb
         )
-
-        with open(Path(run, "train-history.pkl"), "wb") as pickle_file:
-            pickle.dump(hist.history, pickle_file)
 
 
     def cv():

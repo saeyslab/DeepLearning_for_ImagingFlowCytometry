@@ -6,10 +6,11 @@ import sklearn
 from pathlib import Path
 from tabulate import tabulate
 from tqdm import tqdm
+import pickle
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args, writer, fold):
+    def __init__(self, ds, ds_size, logfile, args, fold):
         self.ds = ds
         self.ds_size = ds_size
         self.log = open(logfile, mode="wt", buffering=1)
@@ -19,17 +20,20 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.batch = 0
         self.args = args
         self.fold = fold
-        self.metrics = []
-        self.writer = writer
+        self.history = {}
+        self.runcount = 0
 
         self.log.write("TRAINING FOLD %d\n" % self.fold)
 
-    def do(self):
+    def log_in_history(self, logs):
+        for k, v in logs.items():
+            self.history.setdefault(k, []).append(v)
+
+    def do(self, logs):
 
         all_labels = np.empty((self.ds_size,), dtype=int)
         all_preds = np.empty((self.ds_size,), dtype=int)
 
-        print()
         print()
 
         pos = 0
@@ -42,19 +46,18 @@ class ValidationMonitor(keras.callbacks.Callback):
             pos += l
 
         print()
-        print()
 
         self.log.write("Epoch: %d, batch: %d\n" % (self.epoch, self.batch))
         
         bal_acc = sklearn.metrics.balanced_accuracy_score(all_labels, all_preds)
-
-        self.metrics.append(bal_acc)
-
         cm = sklearn.metrics.confusion_matrix(all_labels, all_preds)
+
+        logs["val_balanced_accuracy"] = bal_acc
+        logs["val_confusion_matrix"] = cm
+
         if self.max is None or bal_acc > self.max:
             self.log.write("NEW MAX\n")
-            self.max = bal_acc
-            self.max_cm = cm
+            self.max_index = self.runcount
 
             if self.fold is not None:
                 self.model.save(Path(self.args.run_dir, "best-model-fold-%d.h5" % self.fold))
@@ -64,6 +67,9 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.log.write("Bal acc: %.4f\n" % bal_acc)
         self.log.write(tabulate(cm))
         self.log.write("\n")
+        
+        self.runcount += 1
+        return logs
 
     def on_epoch_end(self, epoch, logs):
         self.epoch = epoch
@@ -71,7 +77,9 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.args.freq_type == "epoch"
             and epoch % self.args.update_freq == 0
         ):
-            self.do()
+            print(logs)
+            logs = self.do(logs or {})
+            self.log_in_history(logs)
 
     def on_batch_end(self, batch, logs):
         self.batch = batch
@@ -80,18 +88,30 @@ class ValidationMonitor(keras.callbacks.Callback):
             and batch > 0 
             and batch % self.args.update_freq == 0
         ):
-            self.do()
+            logs = self.do(logs or {})
+            self.log_in_history(logs)
 
     def on_train_end(self, logs):
         if self.args.function == "cv":
-            p = Path(self.args.run_dir, "fold_scores.npy")
+            p = Path(self.args.run_dir, "cv-history.pkl")
             if p.exists():
-                d = np.load(p).item()
-                d["max_cm"].append(self.max_cm)
-                d["metrics"].append(self.metrics)
+                with open(p, "rb") as handle:
+                    hist = pickle.load(handle)
             else:
-                d = {"max_cm": [self.max_cm], "metrics": [self.metrics]}
-            np.save(p, d)
+                hist = {}
+            
+            hist.setdefault("max_index", []).append(self.max_index)
+            for k, v in self.history.items():
+                hist.setdefault(k, []).append(v)
+            
+            with open(p, "wb") as handle:
+                pickle.dump(hist, handle)
+                
         elif self.args.function == "train":
-            p = Path(self.args.run_dir, "max_scores.npy")
-            np.save(p, [self.max_cm])
+            p = Path(self.args.run_dir, "train-history.pkl")
+            hist = {}
+            hist["max_index"] = self.max_index
+            for k, v in self.history.items():
+                hist.setdefault(k, []).append(v)
+            with open(p, "wb") as handle:
+                pickle.dump(hist, handle)
