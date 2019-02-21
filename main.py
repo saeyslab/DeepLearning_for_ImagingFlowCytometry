@@ -33,9 +33,11 @@ def main():
     )
 
     def train(split=args.split_dir, run=args.run_dir, id_=100):
+        channel_string = "".join([str(c) for c in args.channels])
+
         train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
             Path(split, "train.txt"), Path(split, "val.txt"),
-            "caches/train-%d" % id_, "caches/val-%d" % id_,
+            "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
             meta, args
         )
 
