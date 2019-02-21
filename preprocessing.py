@@ -26,8 +26,9 @@ def load_and_preprocess_images(paths, args):
 
 def load_dataset(indices_file, cache_file, meta, args, type="train"):
 
-    indices = np.loadtxt(indices_file, dtype=int)
-    meta = meta.iloc[indices]
+    if indices_file is not None:
+        indices = np.loadtxt(indices_file, dtype=int)
+        meta = meta.iloc[indices]
 
     image_columns = ["image_%s" % str(c) for c in args.channels]
 

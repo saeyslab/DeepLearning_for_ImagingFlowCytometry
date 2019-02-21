@@ -15,6 +15,7 @@ def get_args():
     parser.add_argument("--split_dir", type=str)
     parser.add_argument("--run_dir", type=str)
     parser.add_argument("--epochs", type=int)
+    parser.add_argument("--model_hdf5", type=str)
 
     # default
     parser.add_argument("--batch_size", type=int, default=128)

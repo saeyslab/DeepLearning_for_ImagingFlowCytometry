@@ -23,14 +23,7 @@ def main():
 
     meta = pd.read_csv(args.meta)
     
-    m = model.simple_nn(args)
     bal_acc = metrics.BalancedAccuracy(args.noc).balanced_accuracy
-
-    m.compile(
-        optimizer=tf.train.AdamOptimizer(),
-        loss=tf.keras.losses.sparse_categorical_crossentropy,
-        metrics=[bal_acc]
-    )
 
     def train(split=args.split_dir, run=args.run_dir, id_=100):
         channel_string = "".join([str(c) for c in args.channels])
@@ -49,10 +42,17 @@ def main():
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
         
+        m.compile(
+            optimizer=tf.train.AdamOptimizer(),
+            loss=tf.keras.losses.sparse_categorical_crossentropy,
+            metrics=[bal_acc]
+        )
+        
         m.fit(
             train_ds,
             epochs=args.epochs, 
             steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
+            batch_size=args.batch_size,
             callbacks=cb
         )
 
@@ -67,12 +67,29 @@ def main():
                 Path(run).mkdir()
                 train(fold, run, i)
 
-        
 
-    if args.function == "train":
-        train()
+    def predict():
+        ds, ds_len = preprocessing.load_dataset(None, None, meta, args)
+        
+        m.fit(
+            ds,
+            batch_size=args.batch_size,
+            steps_per_epoch=int(np.ceil(ds_len/args.batch_size)),
+        )
+
+
+    function_map = {
+        "train": train,
+        "cv": cv,
+        "predict": predict
+    }
+
+    if args.function in ["train", "cv"]:
+        m = model.simple_nn(args)
     elif args.function == "cv":
-        cv()
+        m = keras.models.load_model(args.model_hdf5, compile=False)
+    
+    function_map[args.function]()
 
 
 if __name__ == "__main__":
