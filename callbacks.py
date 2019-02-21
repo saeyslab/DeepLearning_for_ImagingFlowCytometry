@@ -37,7 +37,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         print()
 
         pos = 0
-        for image_batch, label_batch in tqdm(iter(self.ds), total=np.ceil(self.ds_size/self.args.batch_size)):
+        for image_batch, label_batch in tqdm(iter(self.ds), total=int(np.ceil(self.ds_size/self.args.batch_size))):
             preds = self.model.predict_on_batch(image_batch)
             l = preds.shape[0]
             all_labels[pos:pos+l] = label_batch
@@ -77,7 +77,6 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.args.freq_type == "epoch"
             and epoch % self.args.update_freq == 0
         ):
-            print(logs)
             logs = self.do(logs or {})
             self.log_in_history(logs)
 
