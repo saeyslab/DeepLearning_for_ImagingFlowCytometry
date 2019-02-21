@@ -42,6 +42,7 @@ def main():
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
         
+        m = model.simple_nn(args)
         m.compile(
             optimizer=tf.train.AdamOptimizer(),
             loss=tf.keras.losses.sparse_categorical_crossentropy,
@@ -71,7 +72,14 @@ def main():
     def predict():
         ds, ds_len = preprocessing.load_dataset(None, None, meta, args)
         
-        m.fit(
+        m = keras.models.load_model(args.model_hdf5, compile=False)
+        m.compile(
+            optimizer=tf.train.AdamOptimizer(),
+            loss=tf.keras.losses.sparse_categorical_crossentropy,
+            metrics=[bal_acc]
+        )
+        
+        m.evaluate(
             ds,
             batch_size=args.batch_size,
             steps_per_epoch=int(np.ceil(ds_len/args.batch_size)),
@@ -83,11 +91,6 @@ def main():
         "cv": cv,
         "predict": predict
     }
-
-    if args.function in ["train", "cv"]:
-        m = model.simple_nn(args)
-    elif args.function == "cv":
-        m = keras.models.load_model(args.model_hdf5, compile=False)
     
     function_map[args.function]()
 
