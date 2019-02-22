@@ -16,6 +16,7 @@ def get_args():
     parser.add_argument("--run_dir", type=str)
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--model_hdf5", type=str)
+    parser.add_argument("--model", type=str)
 
     # default
     parser.add_argument("--batch_size", type=int, default=128)
@@ -23,6 +24,9 @@ def get_args():
     parser.add_argument("--image_height", type=int, default=90)
     parser.add_argument("--update_freq", type=int, default=300)
     parser.add_argument("--freq_type", type=str, default="batch")
+    parser.add_argument("--dropout_hidden", type=float, default=0.2)
+    parser.add_argument("--dropout_visible", type=float, default=0.5)
+
 
     args = parser.parse_args()
 

@@ -41,8 +41,13 @@ def main():
             tb,
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
+
+        model_map = {
+            "simple_nn": model.simple_nn,
+            "simple_nn_with_dropout": model.simple_nn_with_dropout
+        }
         
-        m = model.simple_nn(args)
+        m = model_map[args.model](args)
         m.compile(
             optimizer=tf.train.AdamOptimizer(),
             loss=tf.keras.losses.sparse_categorical_crossentropy,
