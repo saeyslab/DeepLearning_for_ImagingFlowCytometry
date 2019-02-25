@@ -24,7 +24,7 @@ def load_and_preprocess_images(paths, args):
         dtype=tf.float32
     )
 
-def load_dataset(indices_file, cache_file, meta, args, type="train"):
+def load_dataset(indices_file, cache_file, meta, args, type="train", augment_func = None):
 
     if indices_file is not None:
         indices = np.loadtxt(indices_file, dtype=int)
@@ -50,7 +50,11 @@ def load_dataset(indices_file, cache_file, meta, args, type="train"):
                 .repeat()
             )
         ds = tf.data.experimental.sample_from_datasets(X).repeat()
-        ds = ds.batch(args.batch_size).prefetch(buffer_size=1)
+
+        if augment_func is not None:
+            ds = ds.map(lambda i, l: (augment_func(i), l), num_parallel_calls=8)
+
+        ds = ds.batch(args.batch_size).prefetch(buffer_size=16)
     elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
             all_image_paths.values, 
@@ -64,11 +68,29 @@ def load_dataset(indices_file, cache_file, meta, args, type="train"):
     return ds, meta.shape[0] 
 
 
-def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args):
-    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, "train")
+def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args, augment_func):
+    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, "train", augment_func)
     val_ds, val_steps = load_dataset(val_indices, val_cache, meta, args, "val")
 
     return train_ds, val_ds, train_steps, val_steps
+
+
+def apply_augmentation(image):
+
+    angle = tf.random_uniform([], -3.14, 3.14, tf.float32, None, "angle")
+    dx = tf.random_uniform([], -6, 6, tf.float32)
+    dy = tf.random_uniform([], -6, 6, tf.float32)
+
+    # Randomly flip the image horizontally.
+    distorted_image = tf.image.random_flip_left_right(image)
+    # Randomly flip the image vertically.
+    distorted_image = tf.image.random_flip_up_down(distorted_image)
+    # Randomly rotate the image
+    distorted_image = tf.contrib.image.rotate(distorted_image, angle)
+
+    distorted_image = tf.contrib.image.translate(distorted_image, [dx, dy])
+
+    return distorted_image
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ import numpy as np
 import pickle
 
 def main():
-    
+  
     args = arguments.get_args()
 
     p = Path(args.run_dir)
@@ -23,15 +23,13 @@ def main():
 
     meta = pd.read_csv(args.meta)
     
-    bal_acc = metrics.BalancedAccuracy(args.noc).balanced_accuracy
-
     def train(split=args.split_dir, run=args.run_dir, id_=100):
         channel_string = "".join([str(c) for c in args.channels])
 
         train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
             Path(split, "train.txt"), Path(split, "val.txt"),
             "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
-            meta, args
+            meta, args, preprocessing.apply_augmentation
         )
 
         tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
@@ -48,6 +46,7 @@ def main():
         }
         
         m = model_map[args.model](args)
+
         m.compile(
             optimizer=tf.train.AdamOptimizer(),
             loss=tf.keras.losses.sparse_categorical_crossentropy,
@@ -58,7 +57,6 @@ def main():
             train_ds,
             epochs=args.epochs, 
             steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
-            batch_size=args.batch_size,
             callbacks=cb
         )
 
@@ -97,6 +95,7 @@ def main():
         "predict": predict
     }
     
+    bal_acc = metrics.BalancedAccuracy(args.noc).balanced_accuracy
     function_map[args.function]()
 
 
