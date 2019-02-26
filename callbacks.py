@@ -37,7 +37,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         print()
 
         pos = 0
-        for image_batch, label_batch in tqdm(iter(self.ds), total=int(np.ceil(self.ds_size/self.args.batch_size))):
+        for image_batch, label_batch in tqdm(iter(self.ds), total=int(np.ceil(self.ds_size/self.args["batch_size"]))):
             preds = self.model.predict_on_batch(image_batch)
             l = preds.shape[0]
             all_labels[pos:pos+l] = label_batch
@@ -60,9 +60,9 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.max_index = self.runcount
 
             if self.fold is not None:
-                self.model.save(Path(self.args.run_dir, "best-model-fold-%d.h5" % self.fold))
+                self.model.save(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold))
             else:
-                self.model.save(Path(self.args.run_dir, "best-model.h5"))
+                self.model.save(Path(self.args["run_dir"], "best-model.h5"))
 
         self.log.write("Bal acc: %.4f\n" % bal_acc)
         self.log.write(tabulate(cm))
@@ -74,8 +74,8 @@ class ValidationMonitor(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs):
         self.epoch = epoch
         if (
-            self.args.freq_type == "epoch"
-            and epoch % self.args.update_freq == 0
+            self.args["freq_type"] == "epoch"
+            and epoch % self.args["update_freq"] == 0
         ):
             logs = self.do(logs or {})
             self.log_in_history(logs)
@@ -83,16 +83,16 @@ class ValidationMonitor(keras.callbacks.Callback):
     def on_batch_end(self, batch, logs):
         self.batch = batch
         if (
-            self.args.freq_type == "batch"
+            self.args["freq_type"] == "batch"
             and batch > 0 
-            and batch % self.args.update_freq == 0
+            and batch % self.args["update_freq"] == 0
         ):
             logs = self.do(logs or {})
             self.log_in_history(logs)
 
     def on_train_end(self, logs):
-        if self.args.function == "cv":
-            p = Path(self.args.run_dir, "cv-history.pkl")
+        if self.args["function"] == "cv":
+            p = Path(self.args["run_dir"], "cv-history.pkl")
             if p.exists():
                 with open(p, "rb") as handle:
                     hist = pickle.load(handle)
@@ -106,8 +106,8 @@ class ValidationMonitor(keras.callbacks.Callback):
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)
                 
-        elif self.args.function == "train":
-            p = Path(self.args.run_dir, "train-history.pkl")
+        elif self.args["function"] == "train":
+            p = Path(self.args["run_dir"], "train-history.pkl")
             hist = {}
             hist["max_index"] = self.max_index
             for k, v in self.history.items():

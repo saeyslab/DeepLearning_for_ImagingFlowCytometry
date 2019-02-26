@@ -1,38 +1,43 @@
 import argparse
 from pathlib import Path
+import json
 
 
 def get_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("function", type=str)
-
-    # no default
-    parser.add_argument("--noc",type=int)
-    parser.add_argument("--channels", "-c", type=int, nargs="+")
-    parser.add_argument("--meta", type=str)
-    parser.add_argument("--image_base", type=str)
-    parser.add_argument("--split_dir", type=str)
-    parser.add_argument("--run_dir", type=str)
-    parser.add_argument("--epochs", type=int)
-    parser.add_argument("--model_hdf5", type=str)
-    parser.add_argument("--model", type=str)
-
-    # default
-    parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--image_width", type=int, default=90)
-    parser.add_argument("--image_height", type=int, default=90)
-    parser.add_argument("--update_freq", type=int, default=300)
-    parser.add_argument("--freq_type", type=str, default="batch")
-    parser.add_argument("--dropout_hidden", type=float, default=0.2)
-    parser.add_argument("--dropout_visible", type=float, default=0.5)
-
-
+    parser.add_argument("config", type=str)
+    
     args = parser.parse_args()
+    
+    with open(args["config"]) as f:
+        args = json.load(f)
 
-    if not Path(args.meta).exists():
-        raise FileNotFoundError("Can't find %s" % args.meta)
-    if not Path(args.image_base).exists():
-        raise FileNotFoundError("Can't find %s" % args.image_base)
+    for k, _ in args.items():
+        if k not in [
+            "noc",
+            "channels", "c"
+            "meta",
+            "image_base",
+            "split_dir",
+            "run_dir",
+            "epochs",
+            "model_hdf5",
+            "model"
+        ] or k not in [
+            "batch_size",
+            "image_width",
+            "image_height",
+            "update_freq",
+            "freq_type",
+            "dropout",
+        ]:
+            raise ValueError("Not a valid argument.")
+
+    if not Path(args["meta"]).exists():
+        raise FileNotFoundError("Can't find %s" % args["meta"])
+    if not Path(args["image_base"]).exists():
+        raise FileNotFoundError("Can't find %s" % args["image_base"])
 
     return args

@@ -6,7 +6,7 @@ import numpy as np
 
 def preprocess_image(image, args):
     image = tf.image.decode_png(image, channels=1)
-    image = tf.image.resize_images(image, [args.image_width, args.image_height])
+    image = tf.image.resize_images(image, [args["image_width"], args["image_height"]])
     image = tf.squeeze(image, axis=[2])
     image /= 2**16
 
@@ -30,14 +30,14 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         indices = np.loadtxt(indices_file, dtype=int)
         meta = meta.iloc[indices]
 
-    image_columns = ["image_%s" % str(c) for c in args.channels]
+    image_columns = ["image_%s" % str(c) for c in args["channels"]]
 
-    all_image_paths = meta[image_columns].applymap(lambda path: str(Path(args.image_base, path)))
+    all_image_paths = meta[image_columns].applymap(lambda path: str(Path(args["image_base"], path)))
     all_image_labels = meta["label"]
     
     if type=="train":
         X = []
-        for i in range(args.noc):
+        for i in range(args["noc"]):
             indices = all_image_labels.index[all_image_labels == i]
             X.append(
                 tf.data.Dataset.from_tensor_slices((
@@ -54,14 +54,14 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         if augment_func is not None:
             ds = ds.map(lambda i, l: (augment_func(i), l), num_parallel_calls=8)
 
-        ds = ds.batch(args.batch_size).prefetch(buffer_size=16)
+        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=16)
     elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
             all_image_paths.values, 
             all_image_labels.values
         ))
         ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=cache_file)
-        ds = ds.batch(args.batch_size).prefetch(buffer_size=1)
+        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=1)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
@@ -102,8 +102,8 @@ if __name__ == "__main__":
     import pandas as pd
 
     args = arguments.get_args()
-    meta = pd.read_csv(args.meta)
-    train_indices = Path(args.split_dir, "val.txt")
+    meta = pd.read_csv(args["meta"])
+    train_indices = Path(args["split_dir"], "val.txt")
     train_cache = str(Path("caches", "test"))
 
     ds, _ = load_dataset(train_indices, train_cache, meta, args, "train")
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
     # before starting the timer
-    batches = 2*np.ceil(meta.shape[0]/args.batch_size)+1
+    batches = 2*np.ceil(meta.shape[0]/args["batch_size"])+1
     it = iter(ds.take(batches+1))
     next(it)
 
@@ -124,6 +124,6 @@ if __name__ == "__main__":
 
     duration = end-start
     print("{} batches: {} s".format(batches, duration))
-    print("{:0.5f} Images/s".format(args.batch_size*batches/duration))
+    print("{:0.5f} Images/s".format(args["batch_size*batches/duration"]))
     print("Total time: {}s".format(end-overall_start))
  

@@ -16,23 +16,23 @@ def main():
   
     args = arguments.get_args()
 
-    p = Path(args.run_dir)
+    p = Path(args["run_dir"])
     if p.exists():
         shutil.rmtree(p)
     p.mkdir()
 
-    meta = pd.read_csv(args.meta)
+    meta = pd.read_csv(args["meta"])
     
-    def train(split=args.split_dir, run=args.run_dir, id_=100):
-        channel_string = "".join([str(c) for c in args.channels])
+    def train(split=args["split_dir"], run=args["run_dir"], id_=100):
+        channel_string = "".join([str(c) for c in args["channels"]])
 
         train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
             Path(split, "train.txt"), Path(split, "val.txt"),
             "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
-            meta, args, preprocessing.apply_augmentation
+            meta, args, None#preprocessing.apply_augmentation
         )
 
-        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args.batch_size, write_graph=True, write_grads=True, write_images=True)
+        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args["batch_size"], write_graph=True, write_grads=True, write_images=True)
 
         cb = [
             tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
@@ -45,7 +45,7 @@ def main():
             "simple_nn_with_dropout": model.simple_nn_with_dropout
         }
         
-        m = model_map[args.model](args)
+        m = model_map[args["model"]](args)
 
         m.compile(
             optimizer=tf.train.AdamOptimizer(),
@@ -55,8 +55,8 @@ def main():
         
         m.fit(
             train_ds,
-            epochs=args.epochs, 
-            steps_per_epoch=int(np.ceil(train_len/args.batch_size)),
+            epochs=args["epochs"], 
+            steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
             callbacks=cb
         )
 
@@ -64,10 +64,10 @@ def main():
     def cv():
         from os import sep
 
-        split_dir = Path(args.split_dir)
+        split_dir = Path(args["split_dir"])
         for i, fold in enumerate(split_dir.iterdir()):
             if fold.is_dir():
-                run = Path(args.run_dir, str(fold).split(sep)[-1])
+                run = Path(args["run_dir"], str(fold).split(sep)[-1])
                 Path(run).mkdir()
                 train(fold, run, i)
 
@@ -75,7 +75,7 @@ def main():
     def predict():
         ds, ds_len = preprocessing.load_dataset(None, None, meta, args)
         
-        m = keras.models.load_model(args.model_hdf5, compile=False)
+        m = keras.models.load_model(args["model_hdf5"], compile=False)
         m.compile(
             optimizer=tf.train.AdamOptimizer(),
             loss=tf.keras.losses.sparse_categorical_crossentropy,
@@ -84,8 +84,8 @@ def main():
         
         m.evaluate(
             ds,
-            batch_size=args.batch_size,
-            steps_per_epoch=int(np.ceil(ds_len/args.batch_size)),
+            batch_size=args["batch_size"],
+            steps_per_epoch=int(np.ceil(ds_len/args["batch_size"])),
         )
 
 
@@ -95,8 +95,8 @@ def main():
         "predict": predict
     }
     
-    bal_acc = metrics.BalancedAccuracy(args.noc).balanced_accuracy
-    function_map[args.function]()
+    bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
+    function_map[args["function"]]()
 
 
 if __name__ == "__main__":
