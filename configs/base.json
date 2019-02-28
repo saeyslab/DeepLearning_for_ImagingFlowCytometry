@@ -13,5 +13,6 @@
 "run_dir": "",
 "epochs": 0,
 "model_hdf5": "",
-"model": ""
+"model": "",
+"l2": 0.0
 }

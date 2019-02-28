@@ -21,7 +21,7 @@ def simple_nn_with_dropout(args):
             input_shape=(len(args["channels"]), args["image_width"], args["image_height"])
         ),
         keras.layers.Dropout(args["dropout"]["visible"]),
-        keras.layers.Dense(384, activation=tf.nn.relu, kernel_regularizer=keras.regularizers.l2(l=args["l2"])),
+        keras.layers.Dense(384, activation=tf.nn.relu), #kernel_regularizer=keras.regularizers.l2(l=args["l2"])),
         keras.layers.Dropout(args["dropout"]["hidden"]),
         keras.layers.Dense(args["noc"], activation="softmax")
     ])

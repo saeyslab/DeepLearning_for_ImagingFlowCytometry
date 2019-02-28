@@ -14,8 +14,9 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.ds = ds
         self.ds_size = ds_size
         self.log = open(logfile, mode="wt", buffering=1)
-        self.max = None
+        self.max_index = None
         self.max_cm = None
+        self.max = None
         self.epoch = 0
         self.batch = 0
         self.args = args
@@ -58,6 +59,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         if self.max is None or bal_acc > self.max:
             self.log.write("NEW MAX\n")
             self.max_index = self.runcount
+            self.max = bal_acc
 
             if self.fold is not None:
                 self.model.save(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold))

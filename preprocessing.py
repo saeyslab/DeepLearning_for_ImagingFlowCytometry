@@ -5,9 +5,10 @@ import numpy as np
 
 
 def preprocess_image(image, args):
-    image = tf.image.decode_png(image, channels=1)
+    image = tf.image.decode_png(image, channels=1, dtype=tf.uint16)
     image = tf.image.resize_images(image, [args["image_width"], args["image_height"]])
     image = tf.squeeze(image, axis=[2])
+    image = tf.to_float(image)
     image /= 2**16
 
     return image
