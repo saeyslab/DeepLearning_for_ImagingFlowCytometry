@@ -8,14 +8,15 @@ def get_args():
 
     parser.add_argument("function", type=str)
     parser.add_argument("config", type=str)
+    parser.add_argument("run_dir", type=str)
+    parser.add_argument("root", type=str)
     
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
 
-    func = args.function 
-    with open(args.config) as f:
-        args = json.load(f)
+    with open(args["config"]) as f:
+        json_args = json.load(f)
 
-    for k, _ in args.items():
+    for k, v in json_args.items():
         if k not in [
             "noc",
             "channels", "c",
@@ -35,12 +36,11 @@ def get_args():
             "l2"
         ]:
             raise ValueError("%s is not a valid argument." % k)
+        args[k] = v
 
-    args["function"] = func
-    
-    if not Path(args["meta"]).exists():
-        raise FileNotFoundError("Can't find %s" % args["meta"])
-    if not Path(args["image_base"]).exists():
-        raise FileNotFoundError("Can't find %s" % args["image_base"])
+    for k in ["meta", "image_base", "split_dir"]:
+        args[k] = str(Path(args["root"], args[k]))
+        if not Path(args[k]).exists():
+            raise FileNotFoundError("Can't find %s" % args[k])
 
     return args

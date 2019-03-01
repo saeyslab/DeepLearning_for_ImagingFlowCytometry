@@ -42,7 +42,8 @@ def main():
 
         model_map = {
             "simple_nn": model.simple_nn,
-            "simple_nn_with_dropout": model.simple_nn_with_dropout
+            "simple_nn_with_dropout": model.simple_nn_with_dropout,
+            "simple_cnn_with_dropout": model.simple_cnn_with_dropout
         }
         
         m = model_map[args["model"]](args)
