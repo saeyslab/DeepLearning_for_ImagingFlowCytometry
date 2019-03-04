@@ -16,14 +16,23 @@ def main():
   
     args = arguments.get_args()
 
-    p = Path(args["run_dir"])
-    if p.exists():
-        shutil.rmtree(p)
-    p.mkdir()
+    def rundir_check():
+        p = Path(args["run_dir"])
+        if p.exists():
+            raise ValueError("Rundir exists, please remove.")
+        p.mkdir()
 
     meta = pd.read_csv(args["meta"])
+        
+    model_map = {
+        "simple_nn": model.simple_nn,
+        "simple_nn_with_dropout": model.simple_nn_with_dropout,
+        "simple_cnn_with_dropout": model.simple_cnn_with_dropout
+    }
     
     def train(split=args["split_dir"], run=args["run_dir"], id_=100):
+        rundir_check()
+
         channel_string = "".join([str(c) for c in args["channels"]])
 
         train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
@@ -40,12 +49,6 @@ def main():
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
 
-        model_map = {
-            "simple_nn": model.simple_nn,
-            "simple_nn_with_dropout": model.simple_nn_with_dropout,
-            "simple_cnn_with_dropout": model.simple_cnn_with_dropout
-        }
-        
         m = model_map[args["model"]](args)
 
         m.compile(
@@ -63,6 +66,8 @@ def main():
 
 
     def cv():
+        rundir_check()
+
         from os import sep
 
         split_dir = Path(args["split_dir"])
@@ -74,6 +79,8 @@ def main():
 
 
     def predict():
+        rundir_check()
+
         ds, ds_len = preprocessing.load_dataset(None, None, meta, args)
         
         m = keras.models.load_model(args["model_hdf5"], compile=False)
@@ -89,11 +96,15 @@ def main():
             steps_per_epoch=int(np.ceil(ds_len/args["batch_size"])),
         )
 
+    def summary():
+        m = model_map[args["model"]](args)
+        m.summary()
 
     function_map = {
         "train": train,
         "cv": cv,
-        "predict": predict
+        "predict": predict,
+        "summary": summary
     }
     
     bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
