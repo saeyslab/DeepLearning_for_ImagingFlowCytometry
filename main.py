@@ -27,7 +27,8 @@ def main():
     model_map = {
         "simple_nn": model.simple_nn,
         "simple_nn_with_dropout": model.simple_nn_with_dropout,
-        "simple_cnn_with_dropout": model.simple_cnn_with_dropout
+        "simple_cnn_with_dropout": model.simple_cnn_with_dropout,
+        "deepflow": model.deepflow
     }
     
     def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=False):
