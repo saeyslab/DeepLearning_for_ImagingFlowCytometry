@@ -30,8 +30,9 @@ def main():
         "simple_cnn_with_dropout": model.simple_cnn_with_dropout
     }
     
-    def train(split=args["split_dir"], run=args["run_dir"], id_=100):
-        rundir_check()
+    def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=False):
+        if not cv:
+            rundir_check()
 
         channel_string = "".join([str(c) for c in args["channels"]])
 
@@ -75,7 +76,7 @@ def main():
             if fold.is_dir():
                 run = Path(args["run_dir"], str(fold).split(sep)[-1])
                 Path(run).mkdir()
-                train(fold, run, i)
+                train(fold, run, i, cv=True)
 
 
     def predict():
