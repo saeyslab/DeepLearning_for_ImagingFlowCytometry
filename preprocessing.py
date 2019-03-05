@@ -53,7 +53,7 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         ds = tf.data.experimental.sample_from_datasets(X).repeat()
 
         if augment_func is not None:
-            ds = ds.map(lambda i, l: (augment_func(i), l), num_parallel_calls=8)
+            ds = ds.map(lambda i, l: (augment_func(i), l))
 
         ds = ds.batch(args["batch_size"]).prefetch(buffer_size=16)
     elif type=="val":
@@ -77,6 +77,7 @@ def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args
 
 
 def apply_augmentation(image):
+    image = tf.transpose(image, [1, 2, 0])
 
     angle = tf.random_uniform([], -3.14, 3.14, tf.float32, None, "angle")
     dx = tf.random_uniform([], -6, 6, tf.float32)
@@ -91,6 +92,7 @@ def apply_augmentation(image):
 
     distorted_image = tf.contrib.image.translate(distorted_image, [dx, dy])
 
+    distorted_image = tf.transpose(distorted_image, [2, 0, 1])
     return distorted_image
 
 
@@ -101,13 +103,14 @@ if __name__ == "__main__":
     import arguments
     from pathlib import Path
     import pandas as pd
+    from matplotlib import pyplot as plt
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
     train_indices = Path(args["split_dir"], "val.txt")
     train_cache = str(Path("caches", "test"))
 
-    ds, _ = load_dataset(train_indices, train_cache, meta, args, "train")
+    ds, _ = load_dataset(train_indices, train_cache, meta, args, "train", augment_func=apply_augmentation)
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
@@ -118,13 +121,20 @@ if __name__ == "__main__":
 
     start = time.time()
     for i,(images,labels) in enumerate(it):
+        for i, image in enumerate(images):
+            print(image.shape)
+            plt.imshow(image[0])
+            plt.savefig("image_%d.png"%i)
+            if i == 10:
+                break
         if (i%10 == 0):
             print('.', end='')
         print()
         end = time.time()
+        break
 
     duration = end-start
     print("{} batches: {} s".format(batches, duration))
-    print("{:0.5f} Images/s".format(args["batch_size*batches/duration"]))
+    print("{:0.5f} Images/s".format(args["batch_size"]*batches/duration))
     print("Total time: {}s".format(end-overall_start))
  

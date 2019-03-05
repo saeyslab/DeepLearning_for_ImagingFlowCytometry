@@ -38,10 +38,13 @@ def get_args():
             "learning_rate_decay",
             "epochs_per_decay",
             "momentum",
-            "optimizer"
+            "optimizer",
+            "augmentation"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
+
+    args["augmentation"] = args["augmentation"] == 1
 
     for k in ["meta", "image_base", "split_dir"]:
         args[k] = str(Path(args["root"], args[k]))

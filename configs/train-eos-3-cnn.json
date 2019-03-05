@@ -9,15 +9,10 @@
 "channels": [1, 2, 6, 9],
 "meta": "eos_data/train_data.csv",
 "image_base": "eos_data/",
-"split_dir": "eos_meta/s23_5folds",
+"split_dir": "eos_meta/s23_5folds/0",
 "epochs": 20,
 "model_hdf5": "",
-"model": "deepflow",
-"l2": 0.0005,
-"learning_rate": 0.001,
-"learning_rate_decay": 0.6,
-"epochs_per_decay": 3,
-"momentum": 0.9,
-"optimizer": "sgd_mom",
-"augmentation": 1 
+"model": "simple_cnn_with_dropout",
+"l2": 0.0,
+"augmentation": 1
 }

@@ -13,5 +13,6 @@
 "epochs": 20,
 "model_hdf5": "",
 "model": "simple_cnn_with_dropout",
-"l2": 0.0
+"l2": 0.0,
+"augmentation": 1
 }

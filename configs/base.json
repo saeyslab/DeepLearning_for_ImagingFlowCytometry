@@ -18,5 +18,6 @@
 "learning_rate": 0.0,
 "learning_rate_decay": 0.0,
 "epochs_per_decay": 0,
-"momentum": 0.0 
+"momentum": 0.0,
+"aug": 0 
 }
