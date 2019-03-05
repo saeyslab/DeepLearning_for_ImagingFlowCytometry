@@ -18,6 +18,6 @@
 "learning_rate_decay": 0.6,
 "epochs_per_decay": 3,
 "momentum": 0.9,
-"optimizer": "sgd_mom",
-"augmentation": 1 
+"optimizer": "adam",
+"augmentation": 1
 }

@@ -13,11 +13,10 @@
 "model_hdf5": "",
 "model": "deepflow",
 "l2": 0.0005,
-"learning_rate": 0.01,
+"learning_rate": 0.001,
 "learning_rate_decay": 0.6,
 "epochs_per_decay": 3,
 "momentum": 0.9,
-"optimizer": "sgd_mom",
-"schedule": "step_decay",
+"optimizer": "adam",
 "augmentation": 1 
 }

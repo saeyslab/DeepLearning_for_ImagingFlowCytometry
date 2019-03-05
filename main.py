@@ -1,8 +1,5 @@
 import arguments
 import model
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import callbacks as tf_callbacks
 import callbacks as my_callbacks
 import preprocessing
 import metrics
@@ -13,6 +10,10 @@ import numpy as np
 import pickle
 import schedules
 import json
+
+from tensorflow import keras
+import tensorflow as tf
+from tensorflow.keras import callbacks as tf_callbacks
 
 
 def main():
@@ -35,7 +36,7 @@ def main():
     }
 
     optimizer_map = {
-        "adam": tf.train.AdamOptimizer(),
+        "adam": tf.train.AdamOptimizer(learning_rate=args["learning_rate"]),
         "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
     }
 
@@ -66,7 +67,7 @@ def main():
         ]
 
         if "schedule" in args:
-            cb += lr_schedule_map[args["schedule"]]
+            cb.append(lr_schedule_map[args["schedule"]])
 
         m = model_map[args["model"]](args)
         optimizer = optimizer_map[args["optimizer"]]
