@@ -39,7 +39,8 @@ def get_args():
             "epochs_per_decay",
             "momentum",
             "optimizer",
-            "augmentation"
+            "augmentation",
+            "schedule"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
