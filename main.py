@@ -11,6 +11,9 @@ import shutil
 import pandas as pd
 import numpy as np
 import pickle
+import schedules
+import json
+
 
 def main():
   
@@ -29,6 +32,15 @@ def main():
         "simple_nn_with_dropout": model.simple_nn_with_dropout,
         "simple_cnn_with_dropout": model.simple_cnn_with_dropout,
         "deepflow": model.deepflow
+    }
+
+    optimizer_map = {
+        "adam": tf.train.AdamOptimizer(),
+        "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
+    }
+
+    lr_schedule_map = {
+        "step_decay": schedules.get_step_decay(args)
     }
     
     def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=False):
@@ -51,10 +63,14 @@ def main():
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
         ]
 
+        if "schedule" in args:
+            cb += lr_schedule_map[args["schedule"]]
+
         m = model_map[args["model"]](args)
+        optimizer = optimizer_map[args["optimizer"]]
 
         m.compile(
-            optimizer=tf.train.AdamOptimizer(),
+            optimizer=optimizer,
             loss=tf.keras.losses.sparse_categorical_crossentropy,
             metrics=[bal_acc]
         )

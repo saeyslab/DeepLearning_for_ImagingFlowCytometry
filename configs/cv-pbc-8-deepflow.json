@@ -12,5 +12,9 @@
 "epochs": 20,
 "model_hdf5": "",
 "model": "deepflow",
-"l2": 0.0005
+"l2": 0.0005,
+"learning_rate": 0.01,
+"momentum": 0.9,
+"optimizer": "sgd_mom",
+"schedule": "step_decay" 
 }

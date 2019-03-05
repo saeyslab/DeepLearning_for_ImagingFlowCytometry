@@ -33,7 +33,12 @@ def get_args():
             "update_freq",
             "freq_type",
             "dropout",
-            "l2"
+            "l2",
+            "learning_rate",
+            "learning_rate_decay",
+            "epochs_per_decay",
+            "momentum",
+            "optimizer"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
