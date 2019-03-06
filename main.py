@@ -1,4 +1,5 @@
 import arguments
+from comet_ml import Experiment
 import model
 import callbacks as my_callbacks
 import preprocessing
@@ -20,11 +21,27 @@ def main():
   
     args = arguments.get_args()
 
-    def rundir_check():
+    def prerun(exp=True):
         p = Path(args["run_dir"])
         if p.exists():
             raise ValueError("Rundir exists, please remove.")
         p.mkdir()
+
+        if exp:
+            experiment = Experiment(
+                api_key="pJ6UYxQwjYoYbCmmutkqP66ni",
+                project_name=args["comet_project"],
+                workspace="mlippie",
+                auto_metric_logging=False,
+                auto_param_logging=False,
+                log_graph=True
+            )
+
+            experiment.log_parameters(args)
+
+            return experiment
+        else:
+            return None
 
     meta = pd.read_csv(args["meta"])
         
@@ -44,9 +61,9 @@ def main():
         "step_decay": schedules.get_step_decay(args)
     }
     
-    def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=False):
-        if not cv:
-            rundir_check()
+    def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=None):
+        if cv is None:
+            cv = prerun()
 
         channel_string = "".join([str(c) for c in args["channels"]])
 
@@ -63,7 +80,7 @@ def main():
         cb = [
             tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
             tb,
-            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_)
+            my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_, cv)
         ]
 
         if "schedule" in args:
@@ -87,7 +104,7 @@ def main():
 
 
     def cv():
-        rundir_check()
+        experiment = prerun()
 
         from os import sep
 
@@ -96,11 +113,11 @@ def main():
             if fold.is_dir():
                 run = Path(args["run_dir"], str(fold).split(sep)[-1])
                 Path(run).mkdir()
-                train(fold, run, i, cv=True)
+                train(fold, run, i, cv=experiment)
 
 
     def predict():
-        rundir_check()
+        prerun(exp=False)
 
         ds, ds_len = preprocessing.load_dataset(None, None, meta, args)
         

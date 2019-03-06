@@ -19,5 +19,6 @@
 "learning_rate_decay": 0.0,
 "epochs_per_decay": 0,
 "momentum": 0.0,
-"aug": 0 
+"aug": 0,
+"comet_project": "" 
 }

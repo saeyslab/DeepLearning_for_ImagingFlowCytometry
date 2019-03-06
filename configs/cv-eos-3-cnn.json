@@ -14,5 +14,6 @@
 "model_hdf5": "",
 "model": "simple_cnn_with_dropout",
 "l2": 0.0,
-"augmentation": 1
+"augmentation": 1,
+"comet_project": "cv-eos-cnn"
 }
