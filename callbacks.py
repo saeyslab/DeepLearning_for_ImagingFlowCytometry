@@ -10,7 +10,7 @@ import pickle
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args, fold):
+    def __init__(self, ds, ds_size, logfile, args, fold, experiment):
         self.ds = ds
         self.ds_size = ds_size
         self.log = open(logfile, mode="wt", buffering=1)
@@ -23,6 +23,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.fold = fold
         self.history = {}
         self.runcount = 0
+        self.experiment = experiment
 
         self.log.write("TRAINING FOLD %d\n" % self.fold)
 
@@ -105,6 +106,7 @@ class ValidationMonitor(keras.callbacks.Callback):
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
             
+            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)
                 
@@ -114,5 +116,7 @@ class ValidationMonitor(keras.callbacks.Callback):
             hist["max_index"] = self.max_index
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
+
+            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)

@@ -19,5 +19,6 @@
 "epochs_per_decay": 3,
 "momentum": 0.9,
 "optimizer": "adam",
-"augmentation": 1
+"augmentation": 1,
+"comet_project": "cv-eos-deepflow"
 }

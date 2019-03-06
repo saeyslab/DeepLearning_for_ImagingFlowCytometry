@@ -40,7 +40,8 @@ def get_args():
             "momentum",
             "optimizer",
             "augmentation",
-            "schedule"
+            "schedule",
+            "comet_project"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
