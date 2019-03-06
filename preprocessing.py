@@ -119,21 +119,23 @@ if __name__ == "__main__":
     it = iter(ds.take(batches+1))
     next(it)
 
+    count = Counter({})
+
     start = time.time()
     for i,(images,labels) in enumerate(it):
-        for i, image in enumerate(images):
-            print(image.shape)
-            plt.imshow(image[0])
-            plt.savefig("image_%d.png"%i)
-            if i == 10:
-                break
+        count+=Counter(labels.numpy())
         if (i%10 == 0):
             print('.', end='')
         print()
         end = time.time()
-        break
+
+        if i == 20:
+            break
 
     duration = end-start
+
+    print(count)
+
     print("{} batches: {} s".format(batches, duration))
     print("{:0.5f} Images/s".format(args["batch_size"]*batches/duration))
     print("Total time: {}s".format(end-overall_start))

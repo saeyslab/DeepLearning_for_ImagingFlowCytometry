@@ -57,10 +57,6 @@ def main():
         "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
     }
 
-    lr_schedule_map = {
-        "step_decay": schedules.get_step_decay(args)
-    }
-    
     def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=None):
         if cv is None:
             cv = prerun()
@@ -82,9 +78,6 @@ def main():
             tb,
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_, cv)
         ]
-
-        if "schedule" in args:
-            cb.append(lr_schedule_map[args["schedule"]])
 
         m = model_map[args["model"]](args)
         optimizer = optimizer_map[args["optimizer"]]
