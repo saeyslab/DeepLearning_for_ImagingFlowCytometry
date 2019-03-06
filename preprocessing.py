@@ -50,7 +50,7 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
                 .cache()
                 .repeat()
             )
-        ds = tf.data.experimental.sample_from_datasets(X).repeat()
+        ds = tf.data.experimental.sample_from_datasets(X, weights=args["sample_weights"]).repeat()
 
         if augment_func is not None:
             ds = ds.map(lambda i, l: (augment_func(i), l))

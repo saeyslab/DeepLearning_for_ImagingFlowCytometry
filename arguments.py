@@ -41,12 +41,19 @@ def get_args():
             "optimizer",
             "augmentation",
             "schedule",
-            "comet_project"
+            "comet_project",
+            "sample_weights"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
 
     args["augmentation"] = args["augmentation"] == 1
+
+    if "sample_weights" in args:
+        if len(args["sample_weights"]) != args["noc"]:
+            raise ValueError("Length of provided sample weights does not equal number of classes.")
+    else:
+        args["sample_weights"] = [1.0]*args["noc"]
 
     for k in ["meta", "image_base", "split_dir"]:
         args[k] = str(Path(args["root"], args[k]))
