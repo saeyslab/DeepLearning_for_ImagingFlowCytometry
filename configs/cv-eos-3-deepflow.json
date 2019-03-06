@@ -20,5 +20,6 @@
 "momentum": 0.9,
 "optimizer": "adam",
 "augmentation": 1,
-"comet_project": "cv-eos-deepflow"
+"comet_project": "cv-eos-deepflow",
+"sample_weights": [1.0, 1.0, 10.0]
 }
