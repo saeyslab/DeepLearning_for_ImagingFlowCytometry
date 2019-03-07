@@ -1,5 +1,48 @@
 import tensorflow as tf
 from tensorflow import keras
+import metrics
+
+def model_map(key):
+    return {
+        "simple_nn": simple_nn,
+        "simple_nn_with_dropout": simple_nn_with_dropout,
+        "simple_cnn_with_dropout": simple_cnn_with_dropout,
+        "deepflow": deepflow
+    }[key]
+
+
+def optimizer_map(key, args):
+    def get_decay_optimizer(args):
+        lr = tf.train.exponential_decay(
+            args["learning_rate"],
+            tf.train.get_or_create_global_step(),
+            args["epochs_per_decay"],
+            args["learning_rate_decay"],
+            staircase=True
+        )
+
+        return tf.train.MomentumOptimizer(lr, args["momentum"])
+    
+    return {
+        "adam": tf.train.AdamOptimizer(learning_rate=args["learning_rate"]),
+        "sgd_mom_decay": get_decay_optimizer(args),
+        "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"]),
+        "rmsprop": tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
+    }[key]
+
+
+def build_model(args):
+    m = model_map(args["model"])(args)
+    optimizer = optimizer_map(args["optimizer"], args)
+
+    bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
+    m.compile(
+        optimizer=optimizer,
+        loss=tf.keras.losses.sparse_categorical_crossentropy,
+        metrics=[bal_acc]
+    )
+
+    return m
 
 
 def simple_nn(args):

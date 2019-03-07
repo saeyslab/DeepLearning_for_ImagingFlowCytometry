@@ -30,7 +30,9 @@ class ValidationMonitor(keras.callbacks.Callback):
     def log_in_history(self, logs):
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
-        self.experiment.log_metrics(logs)
+
+        if self.experiment is not None:
+            self.experiment.log_metrics(logs)
 
     def do(self, logs):
 

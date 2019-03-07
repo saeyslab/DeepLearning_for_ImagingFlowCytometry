@@ -10,11 +10,15 @@ def get_args():
     parser.add_argument("config", type=str)
     parser.add_argument("run_dir", type=str)
     parser.add_argument("root", type=str)
+    parser.add_argument("--overwrite", type=str, default="{}")
     
     args = vars(parser.parse_args())
 
     with open(args["config"]) as f:
         json_args = json.load(f)
+
+        for k,v in json.loads(args["overwrite"]).items():
+            json_args[k] = v
 
     for k, v in json_args.items():
         if k not in [
