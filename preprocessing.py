@@ -8,7 +8,7 @@ def preprocess_image(image, args):
     image = tf.image.decode_png(image, channels=1, dtype=tf.uint16)
     image = tf.image.resize_images(image, [args["image_width"], args["image_height"]])
     image = tf.squeeze(image, axis=[2])
-    image = tf.to_float(image)
+    image = tf.cast(image, tf.float32)
     image /= 2**16
 
     return image
@@ -55,14 +55,14 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         if augment_func is not None:
             ds = ds.map(lambda i, l: (augment_func(i), l))
 
-        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=16)
+        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=256)
     elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
             all_image_paths.values, 
             all_image_labels.values
         ))
-        ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=cache_file)
-        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=1)
+        ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=8).cache(filename=cache_file)
+        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=256)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
@@ -115,28 +115,26 @@ if __name__ == "__main__":
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
     # before starting the timer
-    batches = 2*np.ceil(meta.shape[0]/args["batch_size"])+1
-    it = iter(ds.take(batches+1))
+    batches = 30
+    it = iter(ds)
     next(it)
 
     count = Counter({})
+    times = []
 
     start = time.time()
     for i,(images,labels) in enumerate(it):
-        count+=Counter(labels.numpy())
-        if (i%10 == 0):
-            print('.', end='')
-        print()
-        end = time.time()
+        a = time.time()
+        times.append(a-start)
+        start = a
 
-        if i == 20:
+        if i == 30: 
             break
 
-    duration = end-start
+    plt.plot(times)
+    plt.savefig("tmp.png")
 
-    print(count)
 
-    print("{} batches: {} s".format(batches, duration))
-    print("{:0.5f} Images/s".format(args["batch_size"]*batches/duration))
-    print("Total time: {}s".format(end-overall_start))
+
+
  

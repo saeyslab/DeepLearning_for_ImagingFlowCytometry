@@ -34,7 +34,8 @@ def main():
                 workspace="mlippie",
                 auto_metric_logging=False,
                 auto_param_logging=False,
-                log_graph=True
+                log_graph=True,
+                disabled=True
             )
 
             experiment.log_parameters(args)
@@ -52,9 +53,20 @@ def main():
         "deepflow": model.deepflow
     }
 
+    def get_decay_optimizer():
+        lr = tf.train.exponential_decay(
+            args["learning_rate"],
+            tf.train.get_or_create_global_step(),
+            args["epochs_per_decay"],
+            args["learning_rate_decay"],
+            staircase=True
+        )
+
+        return tf.train.MomentumOptimizer(lr, args["momentum"])
+
     optimizer_map = {
         "adam": tf.train.AdamOptimizer(learning_rate=args["learning_rate"]),
-        "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
+        "sgd_mom": get_decay_optimizer()
     }
 
     def build_model(args):
@@ -67,6 +79,8 @@ def main():
             metrics=[bal_acc]
         )
 
+        return m
+
     def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=None):
         if cv is None:
             cv = prerun()
@@ -75,11 +89,12 @@ def main():
 
         aug = preprocessing.apply_augmentation if args["augmentation"] else None
 
-        train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
-            Path(split, "train.txt"), Path(split, "val.txt"),
-            "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
-            meta, args, aug
-        )
+        with tf.device("/cpu:0"): 
+            train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
+                Path(split, "train.txt"), Path(split, "val.txt"),
+                "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
+                meta, args, aug
+            )
 
         tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args["batch_size"], write_graph=True, write_grads=True, write_images=True)
 
