@@ -30,6 +30,7 @@ class ValidationMonitor(keras.callbacks.Callback):
     def log_in_history(self, logs):
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
+        self.experiment.log_metrics(logs)
 
     def do(self, logs):
 
@@ -106,7 +107,6 @@ class ValidationMonitor(keras.callbacks.Callback):
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
             
-            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)
                 
@@ -117,6 +117,5 @@ class ValidationMonitor(keras.callbacks.Callback):
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
 
-            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)

@@ -57,6 +57,16 @@ def main():
         "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
     }
 
+    def build_model(args):
+        m = model_map[args["model"]](args)
+        optimizer = optimizer_map[args["optimizer"]]
+
+        m.compile(
+            optimizer=optimizer,
+            loss=tf.keras.losses.sparse_categorical_crossentropy,
+            metrics=[bal_acc]
+        )
+
     def train(split=args["split_dir"], run=args["run_dir"], id_=100, cv=None):
         if cv is None:
             cv = prerun()
@@ -79,15 +89,7 @@ def main():
             my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_, cv)
         ]
 
-        m = model_map[args["model"]](args)
-        optimizer = optimizer_map[args["optimizer"]]
-
-        m.compile(
-            optimizer=optimizer,
-            loss=tf.keras.losses.sparse_categorical_crossentropy,
-            metrics=[bal_acc]
-        )
-        
+        m = build_model(args)        
         m.fit(
             train_ds,
             epochs=args["epochs"], 
@@ -131,11 +133,21 @@ def main():
         m = model_map[args["model"]](args)
         m.summary()
 
+    def param_search():
+        param_grid = [
+            {"learning_rate": [0.001, 0.0001], "momentum": [0.99, 0.9], "optimizer": ["sgd_mom"]},
+            {"learning_rate": [0.01, 0.001, 0.0001], "optimizer": ["adam"]}
+        ]
+
+        m = keras.wrappers.scikit_learn.KerasClassifier(build_fn=build_model)
+        print(m)
+
     function_map = {
         "train": train,
         "cv": cv,
         "predict": predict,
-        "summary": summary
+        "summary": summary,
+        "param_search": param_search
     }
     
     bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
