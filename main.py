@@ -32,10 +32,9 @@ def main():
                 api_key="pJ6UYxQwjYoYbCmmutkqP66ni",
                 project_name=args["comet_project"],
                 workspace="mlippie",
-                auto_metric_logging=False,
+                auto_metric_logging=True,
                 auto_param_logging=False,
-                log_graph=True,
-                disabled=True
+                log_graph=True
             )
 
             experiment.log_parameters(args)
