@@ -60,8 +60,8 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         ds = (
             tf.data.experimental.sample_from_datasets(X)
             .batch(batch_size=args["batch_size"])
-            .prefetch(16)
             .map(lambda i, l: (load_and_preprocess_batch(i, args, augment_func), l), num_parallel_calls=4)
+            .prefetch(16)
         )
     elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
@@ -69,8 +69,8 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
             all_image_labels.values
         ))
         ds = ds.batch(args["batch_size"])
-        ds = ds.prefetch(16)
         ds = ds.map(lambda i, l: (load_and_preprocess_batch(i, args, None), l), num_parallel_calls=4).cache(filename=cache_file)
+        ds = ds.prefetch(16)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
