@@ -2,10 +2,11 @@ import arguments
 from comet_ml import Experiment, OfflineExperiment
 import model
 from pathlib import Path
-import functions.param_search
+import functions.param
 import functions.train
 import pandas as pd
 import sys
+import json
 
 import tensorflow as tf
 
@@ -14,6 +15,9 @@ def prerun(args, exp=True):
     if p.exists():
         raise ValueError("Rundir exists, please remove.")
     p.mkdir()
+
+    with open(Path(p, "args.json"), "w") as fp:
+        json.dump(args, fp)
     
     if exp:
         experiment = Experiment(
@@ -52,15 +56,15 @@ def main():
     def predict():
         raise NotImplementedError()
 
-    def param_search():
-        functions.param_search.run(args, meta)
+    def param():
+        functions.param.run(args, meta)
 
     function_map = {
         "train": train,
         "cv": cv,
         "predict": predict,
         "summary": summary,
-        "param_search": param_search
+        "param": param
     }
     
     function_map[args["function"]]()

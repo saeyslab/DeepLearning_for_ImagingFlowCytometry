@@ -46,7 +46,8 @@ def get_args():
             "augmentation",
             "schedule",
             "comet_project",
-            "sample_weights"
+            "sample_weights",
+            "param_grid"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v

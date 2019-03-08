@@ -70,7 +70,7 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
         ))
         ds = ds.batch(args["batch_size"])
         ds = ds.prefetch(16)
-        ds = ds.map(lambda i, l: (load_and_preprocess_batch(i, args, augment_func), l), num_parallel_calls=4).cache(filename=cache_file)
+        ds = ds.map(lambda i, l: (load_and_preprocess_batch(i, args, None), l), num_parallel_calls=4).cache(filename=cache_file)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
@@ -118,12 +118,12 @@ if __name__ == "__main__":
     train_indices = Path("/home/maximl/DATA/Experiment_data/eos_meta/s23_5folds/0", "val.txt")
     train_cache = str(Path("caches", "test"))
 
-    ds, _ = load_dataset(train_indices, train_cache, meta, args, "train", augment_func=apply_augmentation)
+    ds, _ = load_dataset(train_indices, train_cache, meta, args, "val", augment_func=apply_augmentation)
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
     # before starting the timer
-    batches = 30
+    batches = 5
     it = iter(ds)
     next(it)
 
@@ -132,6 +132,7 @@ if __name__ == "__main__":
 
     start = time.time()
     for i,(images,labels) in enumerate(it):
+        print(images.numpy().shape)
         a = time.time()
         times.append(a-start)
         start = a

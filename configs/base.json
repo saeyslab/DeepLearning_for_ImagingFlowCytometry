@@ -21,5 +21,6 @@
 "momentum": 0.0,
 "aug": 0,
 "comet_project": "",
-"sample_weights": [0.0] 
+"sample_weights": [0.0],
+"param_grid": [] 
 }

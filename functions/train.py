@@ -48,7 +48,7 @@ def run(args, meta, id_=100, exp=None):
     hist = m.fit(
         train_ds,
         epochs=args["epochs"], 
-        steps_per_epoch=10,#int(np.ceil(train_len/args["batch_size"])),
+        steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
         callbacks=cb
     )
 

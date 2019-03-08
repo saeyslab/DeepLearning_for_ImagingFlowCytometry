@@ -10,11 +10,7 @@ import time
 def run(args, meta):
     experiment = main.prerun(args, exp=True)
 
-    param_grid = [
-        {"learning_rate": [0.001, 0.0001], "momentum": [0.99, 0.9], "optimizer": ["rmsprop"]},
-        {"learning_rate": [0.001, 0.0001], "optimizer": ["adam"]}
-    ]
-
+    param_grid = args["param_grid"] 
     experiment.log_other("param_grid", param_grid)
 
     grid_iterator = model_selection.ParameterGrid(param_grid)

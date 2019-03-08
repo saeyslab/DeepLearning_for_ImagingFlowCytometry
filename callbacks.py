@@ -112,7 +112,7 @@ class ValidationMonitor(keras.callbacks.Callback):
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)
                 
-        elif self.args["function"] == "train":
+        elif self.args["function"] == "train" or self.args["function"] == "param":
             p = Path(self.args["run_dir"], "train-history.pkl")
             hist = {}
             hist["max_index"] = self.max_index
