@@ -10,13 +10,21 @@ import pickle
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args, fold, experiment):
-        self.ds = ds
-        self.ds_size = ds_size
-        self.log = open(logfile, mode="wt", buffering=1)
+    def __init__(self, ds, ds_size, logfile, args, fold, experiment, patience=3, epsilon=0.0001):
+
+        # early stopping vars
+        self.epsilon = epsilon
+        self.wait = 0
+        self.patience = patience
         self.max_index = None
         self.max_cm = None
         self.max = None
+
+        # ds vars
+        self.ds = ds
+        self.ds_size = ds_size
+        
+        self.log = open(logfile, mode="wt", buffering=1)
         self.epoch = 0
         self.batch = 0
         self.args = args
@@ -60,15 +68,18 @@ class ValidationMonitor(keras.callbacks.Callback):
         logs["val_balanced_accuracy"] = bal_acc
         logs["val_confusion_matrix"] = cm
 
-        if self.max is None or bal_acc > self.max:
+        if self.max is None or (bal_acc - self.max) > self.epsilon:
             self.log.write("NEW MAX\n")
             self.max_index = self.runcount
             self.max = bal_acc
+            self.wait = 0
 
             if self.fold is not None:
                 self.model.save(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold))
             else:
                 self.model.save(Path(self.args["run_dir"], "best-model.h5"))
+
+        self.wait += 1
 
         self.log.write("Bal acc: %.4f\n" % bal_acc)
         self.log.write(tabulate(cm))
@@ -85,6 +96,10 @@ class ValidationMonitor(keras.callbacks.Callback):
         ):
             logs = self.do(logs or {})
             self.log_in_history(logs)
+
+        if self.patience is not None:
+            if self.patience <= self.wait:
+                self.model.stop_training = True
 
     def on_batch_end(self, batch, logs):
         self.batch = batch
