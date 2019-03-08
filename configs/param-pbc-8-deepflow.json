@@ -4,7 +4,7 @@
 "image_height": 90,
 "update_freq": 1,
 "freq_type": "epoch",
-"noc": 3,
+"noc": 8,
 "channels": [1, 6, 9],
 "meta": "10color_data/train_data.csv",
 "image_base": "10color_data/",
