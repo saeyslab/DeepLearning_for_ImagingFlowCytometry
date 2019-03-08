@@ -21,7 +21,6 @@ def run(args, meta):
         args_copy = orig.copy()
         args_copy.update(gridpoint)
 
-        args_copy["epochs"] = 1
         args_copy["run_dir"] = str(Path(args["run_dir"], str(i)))
 
         return functions.train.run(args_copy, meta)
