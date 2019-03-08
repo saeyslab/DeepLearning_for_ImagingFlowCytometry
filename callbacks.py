@@ -10,12 +10,12 @@ import pickle
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args, fold, experiment, patience=3, epsilon=0.0001):
+    def __init__(self, ds, ds_size, logfile, args, fold, experiment):
 
         # early stopping vars
-        self.epsilon = epsilon
+        self.epsilon = args["epsilon"]
         self.wait = 0
-        self.patience = patience
+        self.patience = args["patience"]
         self.max_index = None
         self.max_cm = None
         self.max = None
@@ -67,6 +67,8 @@ class ValidationMonitor(keras.callbacks.Callback):
 
         logs["val_balanced_accuracy"] = bal_acc
         logs["val_confusion_matrix"] = cm
+        
+        self.wait += 1
 
         if self.max is None or (bal_acc - self.max) > self.epsilon:
             self.log.write("NEW MAX\n")
@@ -78,8 +80,6 @@ class ValidationMonitor(keras.callbacks.Callback):
                 self.model.save(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold))
             else:
                 self.model.save(Path(self.args["run_dir"], "best-model.h5"))
-
-        self.wait += 1
 
         self.log.write("Bal acc: %.4f\n" % bal_acc)
         self.log.write(tabulate(cm))

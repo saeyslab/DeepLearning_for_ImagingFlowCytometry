@@ -20,5 +20,7 @@
 "optimizer": "adam",
 "augmentation": 1, 
 "comet_project": "cv-pbc-deepflow",
-"sample_weights": [1.0, 1.0, 10.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+"sample_weights": [1.0, 1.0, 10.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+"patience": 10,
+"epsilon": 0.00001
 }
