@@ -11,8 +11,8 @@ def model_map(key):
     }[key]
 
 
-def optimizer_map(key, args):
-    def get_decay_optimizer(args):
+def optimizer_map(key):
+    def get_decay_mom(args):
         lr = tf.train.exponential_decay(
             args["learning_rate"],
             tf.train.get_or_create_global_step(),
@@ -22,18 +22,27 @@ def optimizer_map(key, args):
         )
 
         return tf.train.MomentumOptimizer(lr, args["momentum"])
-    
+
+    def get_mom(args):
+        return tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
+
+    def get_adam(args):
+        return tf.train.AdamOptimizer(learning_rate=args["learning_rate"])
+
+    def get_rmsprop(args):
+        return tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
+
     return {
-        "adam": tf.train.AdamOptimizer(learning_rate=args["learning_rate"]),
-        "sgd_mom_decay": get_decay_optimizer(args),
-        "sgd_mom": tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"]),
-        "rmsprop": tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
+        "adam": get_adam,
+        "mom_decay": get_decay_mom,
+        "mom": get_mom,
+        "rmsprop": get_rmsprop
     }[key]
 
 
 def build_model(args):
     m = model_map(args["model"])(args)
-    optimizer = optimizer_map(args["optimizer"], args)
+    optimizer = optimizer_map(args["optimizer"])(args)
 
     bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
     m.compile(
