@@ -31,6 +31,9 @@ class ValidationMonitor(keras.callbacks.Callback):
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
 
+        if self.experiment is not None:
+            self.experiment.log_metrics(logs)
+
     def do(self, logs):
 
         all_labels = np.empty((self.ds_size,), dtype=int)
@@ -106,17 +109,15 @@ class ValidationMonitor(keras.callbacks.Callback):
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
             
-            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)
                 
-        elif self.args["function"] == "train":
+        elif self.args["function"] == "train" or self.args["function"] == "param":
             p = Path(self.args["run_dir"], "train-history.pkl")
             hist = {}
             hist["max_index"] = self.max_index
             for k, v in self.history.items():
                 hist.setdefault(k, []).append(v)
 
-            self.experiment.log_metrics(hist)
             with open(p, "wb") as handle:
                 pickle.dump(hist, handle)

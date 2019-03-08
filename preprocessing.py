@@ -5,23 +5,31 @@ import numpy as np
 
 
 def preprocess_image(image, args):
+    image = tf.read_file(image)
     image = tf.image.decode_png(image, channels=1, dtype=tf.uint16)
     image = tf.image.resize_images(image, [args["image_width"], args["image_height"]])
     image = tf.squeeze(image, axis=[2])
-    image = tf.to_float(image)
+    image = tf.cast(image, tf.float32)
     image /= 2**16
 
     return image
 
-def load_and_preprocess_image(path, args):
-    image = tf.read_file(path)
-    return preprocess_image(image, args)
-
-
-def load_and_preprocess_images(paths, args):
-    return tf.map_fn(
-        lambda j: load_and_preprocess_image(j, args),
+def load_and_preprocess_images(paths, args, aug):
+    tmp = tf.map_fn(
+        lambda p: preprocess_image(p, args),
         paths,
+        dtype=tf.float32
+    )
+
+    if aug is None:
+        return tmp
+    else:
+        return aug(tmp)
+
+def load_and_preprocess_batch(batch, args, aug):
+    return tf.map_fn(
+        lambda b: load_and_preprocess_images(b, args, aug),
+        batch,
         dtype=tf.float32
     )
 
@@ -44,25 +52,25 @@ def load_dataset(indices_file, cache_file, meta, args, type="train", augment_fun
                 tf.data.Dataset.from_tensor_slices((
                     all_image_paths.loc[indices].values, 
                     all_image_labels.loc[indices].values
-                ))
-                .shuffle(buffer_size=len(indices))
-                .map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=8)
-                .cache()
-                .repeat()
+                )).apply(
+                    tf.data.experimental.shuffle_and_repeat(len(indices))
+                ).cache()
             )
-        ds = tf.data.experimental.sample_from_datasets(X, weights=args["sample_weights"]).repeat()
-
-        if augment_func is not None:
-            ds = ds.map(lambda i, l: (augment_func(i), l))
-
-        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=16)
+        
+        ds = (
+            tf.data.experimental.sample_from_datasets(X)
+            .batch(batch_size=args["batch_size"])
+            .prefetch(16)
+            .map(lambda i, l: (load_and_preprocess_batch(i, args, augment_func), l), num_parallel_calls=4)
+        )
     elif type=="val":
         ds = tf.data.Dataset.from_tensor_slices((
             all_image_paths.values, 
             all_image_labels.values
         ))
-        ds = ds.map(lambda i, l: (load_and_preprocess_images(i, args), l), num_parallel_calls=4).cache(filename=cache_file)
-        ds = ds.batch(args["batch_size"]).prefetch(buffer_size=1)
+        ds = ds.batch(args["batch_size"])
+        ds = ds.prefetch(16)
+        ds = ds.map(lambda i, l: (load_and_preprocess_batch(i, args, None), l), num_parallel_calls=4).cache(filename=cache_file)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
@@ -107,34 +115,35 @@ if __name__ == "__main__":
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
-    train_indices = Path(args["split_dir"], "val.txt")
+    train_indices = Path("/home/maximl/DATA/Experiment_data/eos_meta/s23_5folds/0", "val.txt")
     train_cache = str(Path("caches", "test"))
 
-    ds, _ = load_dataset(train_indices, train_cache, meta, args, "train", augment_func=apply_augmentation)
+    ds, _ = load_dataset(train_indices, train_cache, meta, args, "val", augment_func=apply_augmentation)
 
     overall_start = time.time()
     # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
     # before starting the timer
-    batches = 2*np.ceil(meta.shape[0]/args["batch_size"])+1
-    it = iter(ds.take(batches+1))
+    batches = 5
+    it = iter(ds)
     next(it)
+
+    count = Counter({})
+    times = []
 
     start = time.time()
     for i,(images,labels) in enumerate(it):
-        for i, image in enumerate(images):
-            print(image.shape)
-            plt.imshow(image[0])
-            plt.savefig("image_%d.png"%i)
-            if i == 10:
-                break
-        if (i%10 == 0):
-            print('.', end='')
-        print()
-        end = time.time()
-        break
+        print(images.numpy().shape)
+        a = time.time()
+        times.append(a-start)
+        start = a
 
-    duration = end-start
-    print("{} batches: {} s".format(batches, duration))
-    print("{:0.5f} Images/s".format(args["batch_size"]*batches/duration))
-    print("Total time: {}s".format(end-overall_start))
+        if i == 30: 
+            break
+
+    plt.plot(times)
+    plt.savefig("tmp.png")
+
+
+
+
  

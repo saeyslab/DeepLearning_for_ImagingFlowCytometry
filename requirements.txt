@@ -5,3 +5,4 @@ scikit-learn
 tabulate
 tqdm
 comet_ml
+joblib
