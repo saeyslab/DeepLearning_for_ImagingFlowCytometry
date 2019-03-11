@@ -48,8 +48,8 @@ def get_args():
             "comet_project",
             "sample_weights",
             "param_grid",
-            "patience",
-            "epsilon"
+            "es_patience",
+            "es_epsilon"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
