@@ -26,8 +26,7 @@ def prerun(args, exp=True):
             workspace="mlippie",
             auto_metric_logging=True,
             auto_param_logging=False,
-            log_graph=True,
-            disabled=True
+            log_graph=True
         )
 
         experiment.log_parameters(args)

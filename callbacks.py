@@ -13,9 +13,9 @@ class ValidationMonitor(keras.callbacks.Callback):
     def __init__(self, ds, ds_size, logfile, args, fold, experiment):
 
         # early stopping vars
-        self.epsilon = args["epsilon"]
+        self.epsilon = args["es_epsilon"]
         self.wait = 0
-        self.patience = args["patience"]
+        self.patience = args["es_patience"]
         self.max_index = None
         self.max_cm = None
         self.max = None
