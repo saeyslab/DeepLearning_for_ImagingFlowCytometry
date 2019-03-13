@@ -20,8 +20,7 @@ def get_args():
         for k,v in json.loads(args["overwrite"]).items():
             json_args[k] = v
 
-    for k, v in json_args.items():
-        if k not in [
+    valid_args = [
             "noc",
             "channels", "c",
             "meta",
@@ -49,10 +48,20 @@ def get_args():
             "sample_weights",
             "param_grid",
             "es_patience",
-            "es_epsilon"
-        ]:
+            "es_epsilon",
+            "beta1",
+            "epsilon"
+        ]
+
+    for k, v in json_args.items():
+        if k not in valid_args:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
+
+    if "param_grid" in args:
+        for k, _ in args["param_grid"]:
+            if k not in valid_args:
+                raise ValueError("%s from param_grid is not a valid argument" % k)
 
     args["augmentation"] = args["augmentation"] == 1
 
