@@ -59,7 +59,7 @@ def get_args():
         args[k] = v
 
     if "param_grid" in args:
-        for k, _ in args["param_grid"]:
+        for k, _ in args["param_grid"].items():
             if k not in valid_args:
                 raise ValueError("%s from param_grid is not a valid argument" % k)
 
