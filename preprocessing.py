@@ -17,6 +17,9 @@ class dataset_wrapper:
 
             self.images[i] = np.multiply(ims, masks, dtype=np.float32)/2**16
 
+    def __del__(self):
+        print("object removed")
+
 
 class generator:
     def __init__(self, data, indices):
@@ -109,40 +112,24 @@ if __name__ == "__main__":
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
-    train_indices = Path("/home/maximl/DATA/Experiment_data/PBC/s123_5fold/0", "val.txt")
+    train_indices = Path("/home/maximl/DATA/Experiment_data/9-color_meta/s123_5fold/0", "val.txt")
     train_indices = np.loadtxt(train_indices, dtype=int)
     
     labels = meta["label"].values
 
-    with h5py.File("/home/maximl/DATA/Experiment_data/PBC/s123.h5", "r") as h5fp:    
+    with h5py.File("/home/maximl/DATA/Experiment_data/9-color/s123.h5", "r") as h5fp:    
         data = dataset_wrapper(h5fp, labels, [1, 6, 9])
 
     ds, _ = load_dataset(data, train_indices, labels, args, "val", augment_func=None)
 
-    it = iter(ds.take(2))
+    it = iter(ds)
+
     next(it)
-    run = []
-    fig, axes = plt.subplots(16, 8, figsize=(50,25))
-    axes = axes.ravel()
+    print("here")
+    # next(it)
+    # print("stop")
 
-    images, labels = next(it)
+    # ds = None
+    # data = None
+    # it = None
 
-    for im, ax in zip(images, axes):
-        ax.imshow(im[0])
-
-    fig.savefig("tmp.png")
-
-
-        # times = []
-        # for i in range(1):
-        #     it = iter(ds.take(batches))
-        #     next(it)
-        #     run = []
-        #     start = time.time()
-        #     for i, (images, labels) in enumerate(it):
-        #         print(Counter(labels.numpy()))
-        #         run.append(time.time()-start)
-        #         start = time.time()
-        #     times.append(run)
-
-        # print(np.mean(times))
