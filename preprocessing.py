@@ -49,7 +49,7 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
         ])
         
         ds = ds.batch(batch_size=args["batch_size"])
-        ds = ds.map(lambda images, labels: (preprocess_batch(images, apply_augmentation), labels), num_parallel_calls=4)
+        ds = ds.map(lambda images, labels: (preprocess_batch(images, augment_func), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
     elif type=="val":
         ds = tf.data.Dataset.from_generator(
@@ -116,34 +116,31 @@ if __name__ == "__main__":
     with h5py.File("/home/maximl/DATA/Experiment_data/PBC/s123.h5") as h5fp:    
         data = dataset_wrapper(h5fp, labels, [1, 6, 9])
     
-        ds, _ = load_dataset(data, train_indices, labels, args, "val", augment_func=None)
-    
-        it = iter(ds)
-        for batch in it:
-            print(batch[0].shape)
-        # next(it)
-        # run = []
-        # fig, axes = plt.subplots(16, 8, figsize=(50,25))
-        # axes = axes.ravel()
-    
-        # images, labels = next(it)
-    
-        # for im, ax in zip(images, axes):
-        #     print(im)
-        #     ax.imshow(im[0])
-        # plt.savefig("tmp.png")
+    ds, _ = load_dataset(data, train_indices, labels, args, "train", augment_func=apply_augmentation)
+
+    it = iter(ds.take(2))
+    next(it)
+    run = []
+    fig, axes = plt.subplots(16, 8, figsize=(50,25))
+    axes = axes.ravel()
+
+    images, labels = next(it)
+
+    for im, ax in zip(images, axes):
+        ax.imshow(im[0])
+    plt.savefig("tmp.png")
 
 
-        times = []
-        for i in range(1):
-            it = iter(ds.take(batches))
-            next(it)
-            run = []
-            start = time.time()
-            for i, (images, labels) in enumerate(it):
-                print(Counter(labels.numpy()))
-                run.append(time.time()-start)
-                start = time.time()
-            times.append(run)
+        # times = []
+        # for i in range(1):
+        #     it = iter(ds.take(batches))
+        #     next(it)
+        #     run = []
+        #     start = time.time()
+        #     for i, (images, labels) in enumerate(it):
+        #         print(Counter(labels.numpy()))
+        #         run.append(time.time()-start)
+        #         start = time.time()
+        #     times.append(run)
 
-        print(np.mean(times))
+        # print(np.mean(times))
