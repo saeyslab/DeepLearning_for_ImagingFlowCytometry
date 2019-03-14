@@ -10,12 +10,13 @@ class dataset_wrapper:
         channels = ["channel_%d" % chan for chan in channels]
 
         shape = tuple([len(channels)] + list(h5fp["channel_1/images"].shape))
-        self.images = np.empty(shape=shape, dtype=np.uint16)
+        self.images = np.empty(shape=shape, dtype=np.float32)
         for i, chan in enumerate(channels):
-            images = h5fp[chan]["images"]
+            ims = h5fp[chan]["images"]
             masks = h5fp[chan]["masks"]
 
-            self.images[i] = np.multiply(images, masks, dtype=np.float32)/2**16
+            self.images[i] = np.multiply(ims, masks, dtype=np.float32)/2**16
+
 
 class generator:
     def __init__(self, data, indices):
@@ -113,10 +114,10 @@ if __name__ == "__main__":
     
     labels = meta["label"].values
 
-    with h5py.File("/home/maximl/DATA/Experiment_data/PBC/s123.h5") as h5fp:    
+    with h5py.File("/home/maximl/DATA/Experiment_data/PBC/s123.h5", "r") as h5fp:    
         data = dataset_wrapper(h5fp, labels, [1, 6, 9])
-    
-    ds, _ = load_dataset(data, train_indices, labels, args, "train", augment_func=apply_augmentation)
+
+    ds, _ = load_dataset(data, train_indices, labels, args, "val", augment_func=None)
 
     it = iter(ds.take(2))
     next(it)
@@ -128,7 +129,8 @@ if __name__ == "__main__":
 
     for im, ax in zip(images, axes):
         ax.imshow(im[0])
-    plt.savefig("tmp.png")
+
+    fig.savefig("tmp.png")
 
 
         # times = []
