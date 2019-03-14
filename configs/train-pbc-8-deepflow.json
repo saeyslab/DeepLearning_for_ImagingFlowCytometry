@@ -6,8 +6,8 @@
 "freq_type": "epoch",
 "noc": 8,
 "channels": [1, 6, 9],
-"meta": "PBC/train_data_no_images.csv",
-"split_dir": "PBC/s123_5fold/0",
+"meta": "9-color/train_data_no_images.csv",
+"split_dir": "9-color_meta/s123_5fold/0",
 "epochs": 50,
 "model_hdf5": "",
 "model": "deepflow",
@@ -15,6 +15,10 @@
 "augmentation": 1,
 "comet_project": "train-pbc-deepflow",
 "learning_rate": 0.0001,
-"h5_data": "PBC/s123.h5",
+"beta1": 0.9,
+"epsilon": 0.001,
+"es_patience": 20,
+"es_epsilon": 0.0001,
+"h5_data": "9-color/s123.h5",
 "optimizer": "adam"
 }
