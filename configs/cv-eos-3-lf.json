@@ -1,0 +1,17 @@
+{
+"batch_size" : 128,
+"image_width": 90,
+"image_height": 90,
+"update_freq": 1,
+"freq_type": "epoch",
+"dropout": {"hidden": 0.2, "visible": 0.5},
+"noc": 3,
+"channels": [1, 9],
+"meta": "/home/maximl/data/eos_data/train_data.csv",
+"image_base": "/home/maximl/data/eos_data",
+"split_dir": "/home/maximl/data/eos_meta/s23_5folds/",
+"run_dir": "/home/maximl/runs/simple_nn/cv_eos_3class_lf_dtypes",
+"epochs": 20,
+"model": "simple_nn_with_dropout",
+"l2": 0.0001
+}
