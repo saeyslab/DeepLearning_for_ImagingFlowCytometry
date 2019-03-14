@@ -21,9 +21,7 @@ def prerun(args, meta):
 
     with tf.device("/cpu:0"): 
         train_ds, val_ds, train_len, validation_len = preprocessing.load_datasets(
-            Path(split, "train.txt"), Path(split, "val.txt"),
-            "caches/train-%d-%s" % (id_, channel_string), "caches/val-%d-%s" % (id_, channel_string),
-            meta, args, aug
+            Path(split, "train.txt"), Path(split, "val.txt"), meta, args, aug
         )
 
     return train_ds, val_ds, train_len, validation_len

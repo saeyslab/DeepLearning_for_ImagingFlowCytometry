@@ -2,86 +2,79 @@ import tensorflow as tf
 import time
 from pathlib import Path
 import numpy as np
+import h5py
 
+class dataset_wrapper:
+    def __init__(self, h5fp, labels, channels):
+        self.labels = labels
+        channels = ["channel_%d" % chan for chan in channels]
 
-def preprocess_image(image, args):
-    image = tf.read_file(image)
-    image = tf.image.decode_png(image, channels=1, dtype=tf.uint16)
-    image = tf.image.resize_images(image, [args["image_width"], args["image_height"]])
-    image = tf.squeeze(image, axis=[2])
-    image = tf.cast(image, tf.float32)
-    image /= 2**16
+        shape = tuple([len(channels)] + list(h5fp["channel_1/images"].shape))
+        self.images = np.empty(shape=shape, dtype=np.uint16)
+        for i, chan in enumerate(channels):
+            images = h5fp[chan]["images"]
+            masks = h5fp[chan]["masks"]
 
-    return image
+            self.images[i] = np.multiply(images, masks, dtype=np.float32)/2**16
 
-def load_and_preprocess_images(paths, args, aug):
-    tmp = tf.map_fn(
-        lambda p: preprocess_image(p, args),
-        paths,
-        dtype=tf.float32
-    )
+class generator:
+    def __init__(self, data, indices):
+        self.data = data
+        self.indices = indices
 
-    if aug is None:
-        return tmp
-    else:
-        return aug(tmp)
+    def __call__(self):
+        np.random.shuffle(self.indices) # shuffle happens in-place
+        for idx in self.indices:
+            yield self.data.images[:, idx, :, :], self.data.labels[idx]
 
-def load_and_preprocess_batch(batch, args, aug):
+def preprocess_batch(batch, aug):
     return tf.map_fn(
-        lambda b: load_and_preprocess_images(b, args, aug),
-        batch,
+        aug, batch,
         dtype=tf.float32
     )
 
-def load_dataset(indices_file, cache_file, meta, args, type="train", augment_func = None):
-
-    if indices_file is not None:
-        indices = np.loadtxt(indices_file, dtype=int)
-        meta = meta.iloc[indices]
-
-    image_columns = ["image_%s" % str(c) for c in args["channels"]]
-
-    all_image_paths = meta[image_columns].applymap(lambda path: str(Path(args["image_base"], path)))
-    all_image_labels = meta["label"]
+def load_dataset(data, indices, labels, args, type="train", augment_func = None):
     
     if type=="train":
         X = []
         for i in range(args["noc"]):
-            indices = all_image_labels.index[all_image_labels == i]
-            X.append(
-                tf.data.Dataset.from_tensor_slices((
-                    all_image_paths.loc[indices].values, 
-                    all_image_labels.loc[indices].values
-                )).apply(
-                    tf.data.experimental.shuffle_and_repeat(len(indices))
-                ).cache()
-            )
+            idx = np.where(labels == i)[0]
+            idx = list(set(idx) & set(indices))
+            X.append(idx)
+
+        ds = tf.data.experimental.sample_from_datasets([
+            tf.data.Dataset.from_generator(
+                generator(data, x), output_types=(tf.float32, tf.uint8)
+            ).repeat() for x in X
+        ])
         
-        ds = (
-            tf.data.experimental.sample_from_datasets(X)
-            .batch(batch_size=args["batch_size"])
-            .prefetch(16)
-            .map(lambda i, l: (load_and_preprocess_batch(i, args, augment_func), l), num_parallel_calls=4)
-        )
-    elif type=="val":
-        ds = tf.data.Dataset.from_tensor_slices((
-            all_image_paths.values, 
-            all_image_labels.values
-        ))
-        ds = ds.batch(args["batch_size"])
+        ds = ds.batch(batch_size=args["batch_size"])
+        ds = ds.map(lambda images, labels: (preprocess_batch(images, apply_augmentation), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
-        ds = ds.map(lambda i, l: (load_and_preprocess_batch(i, args, None), l), num_parallel_calls=4).cache(filename=cache_file)
+    elif type=="val":
+        ds = tf.data.Dataset.from_generator(
+            generator(data, indices), output_types=(tf.float32, tf.uint8)
+        )
+        ds = ds.batch(batch_size=args["batch_size"])
+        ds = ds.prefetch(16)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
-    return ds, meta.shape[0] 
+    return ds, len(indices) 
 
 
-def load_datasets(train_indices, val_indices, train_cache, val_cache, meta, args, augment_func):
-    train_ds, train_steps = load_dataset(train_indices, train_cache, meta, args, "train", augment_func)
-    val_ds, val_steps = load_dataset(val_indices, val_cache, meta, args, "val")
+def load_datasets(train_indices, val_indices, meta, args, augment_func):
+    labels = meta["label"].values
+    with h5py.File(args["h5_data"]) as h5fp:    
+        data = dataset_wrapper(h5fp, labels, args["channels"])
 
-    return train_ds, val_ds, train_steps, val_steps
+    train_indices = np.loadtxt(train_indices, dtype=int)
+    val_indices = np.loadtxt(val_indices, dtype=int)
+    
+    train_ds, train_len = load_dataset(data, train_indices, labels, args, "train", augment_func)
+    val_ds, val_len = load_dataset(data, val_indices, labels, args, "val")
+
+    return train_ds, val_ds, train_len, val_len
 
 
 def apply_augmentation(image):
@@ -115,35 +108,42 @@ if __name__ == "__main__":
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
-    train_indices = Path("/home/maximl/DATA/Experiment_data/eos_meta/s23_5folds/0", "val.txt")
-    train_cache = str(Path("caches", "test"))
+    train_indices = Path("/home/maximl/DATA/Experiment_data/PBC/s123_5fold/0", "val.txt")
+    train_indices = np.loadtxt(train_indices, dtype=int)
+    
+    labels = meta["label"].values
 
-    ds, _ = load_dataset(train_indices, train_cache, meta, args, "val", augment_func=apply_augmentation)
-
-    overall_start = time.time()
-    # Fetch a single batch to prime the pipeline (fill the shuffle buffer),
-    # before starting the timer
-    batches = 5
-    it = iter(ds)
-    next(it)
-
-    count = Counter({})
-    times = []
-
-    start = time.time()
-    for i,(images,labels) in enumerate(it):
-        print(images.numpy().shape)
-        a = time.time()
-        times.append(a-start)
-        start = a
-
-        if i == 30: 
-            break
-
-    plt.plot(times)
-    plt.savefig("tmp.png")
+    with h5py.File("/home/maximl/DATA/Experiment_data/PBC/s123.h5") as h5fp:    
+        data = dataset_wrapper(h5fp, labels, [1, 6, 9])
+    
+        ds, _ = load_dataset(data, train_indices, labels, args, "val", augment_func=None)
+    
+        it = iter(ds)
+        for batch in it:
+            print(batch[0].shape)
+        # next(it)
+        # run = []
+        # fig, axes = plt.subplots(16, 8, figsize=(50,25))
+        # axes = axes.ravel()
+    
+        # images, labels = next(it)
+    
+        # for im, ax in zip(images, axes):
+        #     print(im)
+        #     ax.imshow(im[0])
+        # plt.savefig("tmp.png")
 
 
+        times = []
+        for i in range(1):
+            it = iter(ds.take(batches))
+            next(it)
+            run = []
+            start = time.time()
+            for i, (images, labels) in enumerate(it):
+                print(Counter(labels.numpy()))
+                run.append(time.time()-start)
+                start = time.time()
+            times.append(run)
 
-
- 
+        print(np.mean(times))

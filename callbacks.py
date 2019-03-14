@@ -39,8 +39,6 @@ class ValidationMonitor(keras.callbacks.Callback):
         all_labels = np.empty((self.ds_size,), dtype=int)
         all_preds = np.empty((self.ds_size,), dtype=int)
 
-        print()
-
         pos = 0
         for image_batch, label_batch in tqdm(iter(self.ds), total=int(np.ceil(self.ds_size/self.args["batch_size"]))):
             preds = self.model.predict_on_batch(image_batch)
@@ -49,8 +47,6 @@ class ValidationMonitor(keras.callbacks.Callback):
             all_preds[pos:pos+l] = np.argmax(preds, axis=1)
 
             pos += l
-
-        print()
 
         self.log.write("Epoch: %d, batch: %d\n" % (self.epoch, self.batch))
         

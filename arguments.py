@@ -47,7 +47,9 @@ def get_args():
             "schedule",
             "comet_project",
             "sample_weights",
-            "param_grid"
+            "param_grid",
+
+            "h5_data"
         ]:
             raise ValueError("%s is not a valid argument." % k)
         args[k] = v
@@ -60,7 +62,7 @@ def get_args():
     else:
         args["sample_weights"] = [1.0]*args["noc"]
 
-    for k in ["meta", "image_base", "split_dir"]:
+    for k in ["meta", "split_dir", "h5_data"]:
         args[k] = str(Path(args["root"], args[k]))
         if not Path(args[k]).exists():
             raise FileNotFoundError("Can't find %s" % args[k])
