@@ -17,15 +17,12 @@ class dataset_wrapper:
 
             self.images[i] = np.multiply(ims, masks, dtype=np.float32)/2**16
 
-    def __del__(self):
-        print("object removed")
-
 
 class generator:
     def __init__(self, data, indices):
         self.data = data
         self.indices = indices
-
+    
     def __call__(self):
         np.random.shuffle(self.indices) # shuffle happens in-place
         for idx in self.indices:
@@ -44,33 +41,38 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
         for i in range(args["noc"]):
             idx = np.where(labels == i)[0]
             idx = list(set(idx) & set(indices))
-            X.append(idx)
+            X.append(
+                tf.data.Dataset.from_generator(
+                    generator(data, idx), output_types=(tf.float32, tf.uint8)
+                ).repeat()
+            )
 
-        ds = tf.data.experimental.sample_from_datasets([
-            tf.data.Dataset.from_generator(
-                generator(data, x), output_types=(tf.float32, tf.uint8)
-            ).repeat() for x in X
-        ])
-        
+        ds = tf.data.experimental.sample_from_datasets(X)
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.map(lambda images, labels: (preprocess_batch(images, augment_func), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
     elif type=="val":
+        X = generator(data, indices)
         ds = tf.data.Dataset.from_generator(
-            generator(data, indices), output_types=(tf.float32, tf.uint8)
+            X, output_types=(tf.float32, tf.uint8)
         )
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.prefetch(16)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
-    return ds, len(indices) 
+    return ds, len(indices)
 
-
-def load_datasets(train_indices, val_indices, meta, args, augment_func):
-    labels = meta["label"].values
+def load_hdf5_to_memory(args, labels):
     with h5py.File(args["h5_data"]) as h5fp:    
-        data = dataset_wrapper(h5fp, labels, args["channels"])
+        return dataset_wrapper(h5fp, labels, args["channels"])
+
+
+def load_datasets(train_indices, val_indices, meta, args, augment_func, data=None):
+
+    labels = meta["label"].values
+    if data is None:
+        data = load_hdf5_to_memory(args, labels)
 
     train_indices = np.loadtxt(train_indices, dtype=int)
     val_indices = np.loadtxt(val_indices, dtype=int)
@@ -117,15 +119,20 @@ if __name__ == "__main__":
     
     labels = meta["label"].values
 
-    with h5py.File("/home/maximl/DATA/Experiment_data/9-color/s123.h5", "r") as h5fp:    
-        data = dataset_wrapper(h5fp, labels, [1, 6, 9])
+    with h5py.File("/home/maximl/DATA/Experiment_data/9-color/sample2/non_fix_lysis_1_4.h5", "r") as h5fp:    
+        data = dataset_wrapper(h5fp, labels, [1])
 
-    ds, _ = load_dataset(data, train_indices, labels, args, "val", augment_func=None)
+    ds, _= load_dataset(data, np.arange(500), labels, args, "val", augment_func=None)
 
     it = iter(ds)
 
     next(it)
     print("here")
+
+    it = None
+
+    print("here")
+
     # next(it)
     # print("stop")
 
