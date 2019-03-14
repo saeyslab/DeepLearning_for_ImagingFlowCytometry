@@ -27,7 +27,7 @@ def optimizer_map(key):
         return tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
 
     def get_adam(args):
-        return tf.train.AdamOptimizer(learning_rate=args["learning_rate"])
+        return tf.train.AdamOptimizer(learning_rate=args["learning_rate"], beta1=args["beta1"], epsilon=args["epsilon"])
 
     def get_rmsprop(args):
         return tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
