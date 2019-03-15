@@ -13,7 +13,7 @@ class dataset_wrapper:
         channels = ["channel_%d" % chan for chan in channels]
 
         shape = tuple([len(channels)] + list(h5fp["channel_1/images"].shape))
-        self.images = np.empty(shape=shape, dtype=np.uint16)
+        self.images = np.empty(shape=shape, dtype=np.float32)
         for i, chan in enumerate(channels):
             images = h5fp[chan]["images"]
             masks = h5fp[chan]["masks"]
@@ -93,7 +93,6 @@ if __name__ == "__main__":
         images, labels = next(it)
     
         for im, ax in zip(images, axes):
-            print(im)
             ax.imshow(im[0])
         plt.savefig("tmp.png")
 
