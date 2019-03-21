@@ -6,20 +6,20 @@
     "freq_type": "epoch",
     "noc": 8,
     "channels": [1, 6, 9],
-    "meta": "10color_data/train_data.csv",
-    "image_base": "10color_data",
-    "split_dir": "10color_meta/s12_5fold",
+    "meta": "9-color/train_data_no_images.csv",
+    "split_dir": "9-color_meta/s123_5fold",
     "epochs": 50,
     "model": "deepflow",
     "l2": 0.0005,
     "augmentation": 1,
     "comet_project": "cv-pbc-deepflow",
-    "es_patience": 51,
+    "es_patience": 20,
     "es_epsilon": 0.0001,
     "sample_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
     "beta1": 0.9, 
-    "epsilon": 0.1, 
+    "epsilon": 0.001, 
     "learning_rate": 0.0001, 
-    "optimizer": "adam"
+    "optimizer": "adam",
+    "h5_data": "9-color/s123.h5"
 }
 

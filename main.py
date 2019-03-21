@@ -4,20 +4,22 @@ import model
 from pathlib import Path
 import functions.param
 import functions.train
+import functions.cv
 import pandas as pd
 import sys
 import json
 
 import tensorflow as tf
 
-def prerun(args, exp=True):
-    p = Path(args["run_dir"])
-    if p.exists():
-        raise ValueError("Rundir exists, please remove.")
-    p.mkdir()
+def prerun(args, run_dir=True, exp=True):
+    if run_dir:
+        p = Path(args["run_dir"])
+        if p.exists():
+            raise ValueError("Rundir exists, please remove.")
+        p.mkdir()
 
-    with open(Path(p, "args.json"), "w") as fp:
-        json.dump(args, fp)
+        with open(Path(p, "args.json"), "w") as fp:
+            json.dump(args, fp)
     
     if exp:
         experiment = Experiment(
@@ -26,7 +28,8 @@ def prerun(args, exp=True):
             workspace="mlippie",
             auto_metric_logging=True,
             auto_param_logging=False,
-            log_graph=True
+            log_graph=True,
+            disabled=True
         )
 
         experiment.log_parameters(args)
@@ -50,7 +53,7 @@ def main():
         functions.train.run(args, meta)
 
     def cv():
-        raise NotImplementedError()
+        functions.cv.run(args, meta)
 
     def predict():
         raise NotImplementedError()

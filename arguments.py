@@ -47,6 +47,7 @@ def get_args():
             "comet_project",
             "sample_weights",
             "param_grid",
+            "h5_data",
             "es_patience",
             "es_epsilon",
             "beta1",
@@ -72,7 +73,7 @@ def get_args():
     else:
         args["sample_weights"] = [1.0]*args["noc"]
 
-    for k in ["meta", "image_base", "split_dir"]:
+    for k in ["meta", "split_dir", "h5_data"]:
         args[k] = str(Path(args["root"], args[k]))
         if not Path(args[k]).exists():
             raise FileNotFoundError("Can't find %s" % args[k])
