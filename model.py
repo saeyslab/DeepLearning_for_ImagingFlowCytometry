@@ -7,7 +7,9 @@ def model_map(key):
         "simple_nn": simple_nn,
         "simple_nn_with_dropout": simple_nn_with_dropout,
         "simple_cnn_with_dropout": simple_cnn_with_dropout,
-        "deepflow": deepflow
+        "deepflow": deepflow,
+        "resnet50": resnet50,
+        "resnet18": resnet18,
     }[key]
 
 
@@ -29,11 +31,15 @@ def optimizer_map(key):
     def get_adam(args):
         return tf.train.AdamOptimizer(learning_rate=args["learning_rate"], beta1=args["beta1"], epsilon=args["epsilon"])
 
+    def get_adam_def(args):
+        return tf.train.AdamOptimizer()
+
     def get_rmsprop(args):
         return tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
 
     return {
         "adam": get_adam,
+        "adam_def": get_adam_def,
         "mom_decay": get_decay_mom,
         "mom": get_mom,
         "rmsprop": get_rmsprop
@@ -156,5 +162,23 @@ def deepflow(args):
     soft = keras.layers.Dense(args["noc"], activation="softmax", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(fc1)
 
     model = keras.models.Model(inputs=inp, outputs=soft)
+
+    return model
+
+
+def resnet50(args):
+    import resnet
+    
+    s = (len(args["channels"]), args["image_width"], args["image_height"])
+    model = resnet.ResnetBuilder.build_resnet_50(s, args["noc"])
+
+    return model
+
+
+def resnet18(args):
+    import resnet
+    
+    s = (len(args["channels"]), args["image_width"], args["image_height"])
+    model = resnet.ResnetBuilder.build_resnet_18(s, args["noc"])
 
     return model
