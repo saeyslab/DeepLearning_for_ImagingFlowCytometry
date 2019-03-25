@@ -24,7 +24,7 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.ds = ds
         self.ds_size = ds_size
         
-        self.log = open(logfile, mode="wt", buffering=1)
+        self.log = open(logfile, mode="at+", buffering=1)
         self.epoch = 0
         self.batch = 0
         self.args = args
