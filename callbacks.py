@@ -109,7 +109,7 @@ class ValidationMonitor(keras.callbacks.Callback):
 
     def on_train_end(self, logs):
         if self.args["function"] == "cv":
-            p = Path(self.args["run_dir"], "cv-history.pkl")
+            p = Path(self.args["run_dir"], "history.pkl")
             if p.exists():
                 with open(p, "rb") as handle:
                     hist = pickle.load(handle)
@@ -124,7 +124,7 @@ class ValidationMonitor(keras.callbacks.Callback):
                 pickle.dump(hist, handle)
                 
         elif self.args["function"] == "train" or self.args["function"] == "param":
-            p = Path(self.args["run_dir"], "train-history.pkl")
+            p = Path(self.args["run_dir"], "history.pkl")
             hist = {}
             hist["max_index"] = self.max_index
             for k, v in self.history.items():

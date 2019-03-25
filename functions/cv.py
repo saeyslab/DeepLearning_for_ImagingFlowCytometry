@@ -16,7 +16,7 @@ def run(args, meta):
         args_copy = orig.copy()
         args_copy["split_dir"] = str(d)
 
-        functions.train.run(args_copy, meta, new_run_dir=False, data=data)
+        functions.train.run(args_copy, meta, new_run_dir=False, data=data, id_=i)
 
     for i, d in enumerate(Path(args["split_dir"]).iterdir()):
         if d.is_dir():
