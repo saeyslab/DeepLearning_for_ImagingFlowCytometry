@@ -5,7 +5,7 @@ from pathlib import Path
 import preprocessing
 
 def run(args, meta):
-    new_run_dir = args["skip_n_folds"] is None
+    new_run_dir = "skip_n_folds" not in args
     experiment = main.prerun(args, run_dir=new_run_dir, exp=True)
     experiment.log_parameters(args)
     
