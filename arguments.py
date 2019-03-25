@@ -51,7 +51,8 @@ def get_args():
             "es_patience",
             "es_epsilon",
             "beta1",
-            "epsilon"
+            "epsilon",
+            "skip_n_folds"
         ]
 
     for k, v in json_args.items():
