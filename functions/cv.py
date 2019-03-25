@@ -20,7 +20,7 @@ def run(args, meta):
         functions.train.run(args_copy, meta, new_run_dir=False, data=data, id_=i)
 
     for i, d in enumerate(Path(args["split_dir"]).iterdir()):
-        if args["skip_n_folds"] is not None:
+        if not new_run_dir:
             if i < args["skip_n_folds"]:
                 continue
 
