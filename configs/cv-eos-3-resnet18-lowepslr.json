@@ -1,0 +1,22 @@
+{
+"batch_size" : 128,
+"image_width": 90,
+"image_height": 90,
+"update_freq": 1,
+"freq_type": "epoch",
+"noc": 3,
+"channels": [1, 2, 6, 9],
+"meta": "eos/train_data_s23.csv",
+"split_dir": "eos_meta/s23_5fold",
+"epochs": 50,
+"model": "resnet18",
+"augmentation": 1,
+"comet_project": "cv-eos-resnet18",
+"es_patience": 20,
+"es_epsilon": 0.0001,
+"h5_data": "eos/s23.h5",
+"epsilon": 0.1,
+"beta1": 0.9,
+"learning_rate": 0.00001,
+"optimizer": "adam"
+}
