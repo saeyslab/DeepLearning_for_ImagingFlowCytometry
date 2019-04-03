@@ -114,29 +114,20 @@ if __name__ == "__main__":
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
-    train_indices = Path("/home/maximl/DATA/Experiment_data/9-color_meta/s123_5fold/0", "val.txt")
-    train_indices = np.loadtxt(train_indices, dtype=int)
     
     labels = meta["label"].values
 
-    with h5py.File("/home/maximl/DATA/Experiment_data/9-color/sample2/non_fix_lysis_1_4.h5", "r") as h5fp:    
+    with h5py.File(args["h5_data"], "r") as h5fp:    
         data = dataset_wrapper(h5fp, labels, [1])
 
-    ds, _= load_dataset(data, np.arange(500), labels, args, "val", augment_func=None)
+    ds, _= load_dataset(data, np.arange(500), labels, args, "train", augment_func=apply_augmentation)
 
     it = iter(ds)
 
-    next(it)
-    print("here")
+    images, labels = next(it)
+    print(images.shape)
+    plt.imshow(images[0][0])
+    plt.savefig("test.png")
 
     it = None
-
-    print("here")
-
-    # next(it)
-    # print("stop")
-
-    # ds = None
-    # data = None
-    # it = None
 
