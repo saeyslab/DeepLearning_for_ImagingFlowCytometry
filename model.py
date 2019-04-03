@@ -123,7 +123,7 @@ def deepflow(args):
         conv2 = keras.layers.BatchNormalization(axis=1, scale=False)(conv2)
         conv2 = keras.layers.ReLU()(conv2)
 
-        return keras.layers.Concatenate(axis=3)([conv1, conv2])
+        return keras.layers.Concatenate(axis=1)([conv1, conv2])
 
     def _dual_downsample_factory(inp, f_out):
         conv1 = keras.layers.Conv2D(f_out, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
@@ -132,7 +132,7 @@ def deepflow(args):
         
         pool1 = keras.layers.MaxPooling2D(pool_size=[3, 3], strides=[2, 2], padding="same")(inp)
 
-        return keras.layers.Concatenate(axis=3)([conv1, pool1])
+        return keras.layers.Concatenate(axis=1)([conv1, pool1])
 
     inp = keras.layers.Input(shape=(len(args["channels"]), args["image_width"], args["image_height"]))
 
