@@ -19,12 +19,14 @@ class dataset_wrapper:
 
 
 class generator:
-    def __init__(self, data, indices):
+    def __init__(self, data, indices, shuffle=True):
         self.data = data
         self.indices = indices
+        self.shuffle = shuffle
     
     def __call__(self):
-        np.random.shuffle(self.indices) # shuffle happens in-place
+        if self.shuffle:
+            np.random.shuffle(self.indices) # shuffle happens in-place
         for idx in self.indices:
             yield self.data.images[:, idx, :, :], self.data.labels[idx]
 
@@ -52,7 +54,7 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
         ds = ds.map(lambda images, labels: (preprocess_batch(images, augment_func), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
     elif type=="val":
-        X = generator(data, indices)
+        X = generator(data, indices, shuffle=False)
         ds = tf.data.Dataset.from_generator(
             X, output_types=(tf.float32, tf.uint8)
         )

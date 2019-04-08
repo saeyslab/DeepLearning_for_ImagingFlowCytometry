@@ -5,6 +5,7 @@ from pathlib import Path
 import functions.param
 import functions.train
 import functions.cv
+import functions.embed
 import pandas as pd
 import sys
 import json
@@ -61,12 +62,16 @@ def main():
     def param():
         functions.param.run(args, meta)
 
+    def embed():
+        functions.embed.run(args, meta)
+
     function_map = {
         "train": train,
         "cv": cv,
         "predict": predict,
         "summary": summary,
-        "param": param
+        "param": param,
+        "embed": embed
     }
     
     function_map[args["function"]]()

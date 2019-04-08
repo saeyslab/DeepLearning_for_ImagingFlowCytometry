@@ -52,7 +52,9 @@ def get_args():
             "es_epsilon",
             "beta1",
             "epsilon",
-            "skip_n_folds"
+            "skip_n_folds",
+            "model_hdf5",
+            "embedding_output"
         ]
 
     for k, v in json_args.items():
@@ -74,9 +76,10 @@ def get_args():
     else:
         args["sample_weights"] = [1.0]*args["noc"]
 
-    for k in ["meta", "split_dir", "h5_data"]:
-        args[k] = str(Path(args["root"], args[k]))
-        if not Path(args[k]).exists():
-            raise FileNotFoundError("Can't find %s" % args[k])
+    for k in ["meta", "split_dir", "h5_data", "model_hdf5"]:
+        if k in args:
+            args[k] = str(Path(args["root"], args[k]))
+            if not Path(args[k]).exists():
+                raise FileNotFoundError("Can't find %s" % args[k])
 
     return args
