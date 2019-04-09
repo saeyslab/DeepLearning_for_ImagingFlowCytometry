@@ -17,7 +17,7 @@ def run(args, meta):
                 
 
     model = models.load_model(args["model_hdf5"])
-    outputs = model.get_layer("flatten_2").output
+    outputs = model.get_layer(args["layer"]).output
     embedder = models.Model(inputs=model.inputs, outputs=outputs)
 
     data = preprocessing.load_hdf5_to_memory(args, meta["label"])

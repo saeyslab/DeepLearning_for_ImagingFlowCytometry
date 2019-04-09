@@ -54,7 +54,8 @@ def get_args():
             "epsilon",
             "skip_n_folds",
             "model_hdf5",
-            "embedding_output"
+            "embedding_output",
+            "layer"
         ]
 
     for k, v in json_args.items():
