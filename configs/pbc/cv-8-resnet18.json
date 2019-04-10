@@ -7,7 +7,7 @@
 "noc": 8,
 "channels": [1, 6, 9],
 "meta": "9-color/train_data_earlyfix_d23.csv",
-"split_dir": "9-color_meta/earlyfix_d23_5fold",
+"split_dir": "9-color_meta/d23_5fold_shuffled",
 "epochs": 100,
 "model": "resnet18",
 "augmentation": 1,

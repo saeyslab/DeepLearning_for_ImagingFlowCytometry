@@ -7,13 +7,17 @@
 "noc": 3,
 "channels": [1, 2, 6, 9],
 "meta": "eos/train_data_s23.csv",
-"split_dir": "eos_meta/s23_5fold",
-"epochs": 50,
+"split_dir": "eos_meta/s23_5fold_shuffled",
+"epochs": 100,
 "model": "resnet18",
 "augmentation": 1,
 "comet_project": "cv-eos-resnet18",
 "es_patience": 20,
 "es_epsilon": 0.0001,
+"sample_weights": [1.0, 1.0, 1.0],
+"learning_rate": 1e-5, 
+"beta1": 0.9,
+"epsilon": 0.1,
 "h5_data": "eos/s23.h5",
-"optimizer": "adam_def"
+"optimizer": "adam"
 }
