@@ -115,6 +115,9 @@ def simple_cnn_with_dropout(args):
 def deepflow(args):
 
     def _dual_factory(inp, f_out_1, f_out_2):
+        f_out_1 = int(f_out_1/2)
+        f_out_2 = int(f_out_2/2)
+
         conv1 = keras.layers.Conv2D(f_out_1, 1, padding="valid", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
         conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
         conv1 = keras.layers.ReLU()(conv1)
@@ -126,6 +129,8 @@ def deepflow(args):
         return keras.layers.Concatenate(axis=1)([conv1, conv2])
 
     def _dual_downsample_factory(inp, f_out):
+        f_out = int(f_out/2)
+
         conv1 = keras.layers.Conv2D(f_out, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
         conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
         conv1 = keras.layers.ReLU()(conv1)
@@ -136,7 +141,7 @@ def deepflow(args):
 
     inp = keras.layers.Input(shape=(len(args["channels"]), args["image_width"], args["image_height"]))
 
-    conv1 = keras.layers.Conv2D(96, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+    conv1 = keras.layers.Conv2D(48, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
     conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
     conv1 = keras.layers.ReLU()(conv1)
 
