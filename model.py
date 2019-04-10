@@ -10,6 +10,7 @@ def model_map(key):
         "deepflow": deepflow,
         "resnet50": resnet50,
         "resnet18": resnet18,
+        "deepflow_narrow": deepflow_narrow
     }[key]
 
 
@@ -113,6 +114,60 @@ def simple_cnn_with_dropout(args):
     return model
 
 def deepflow(args):
+
+    def _dual_factory(inp, f_out_1, f_out_2):
+        conv1 = keras.layers.Conv2D(f_out_1, 1, padding="valid", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
+        conv1 = keras.layers.ReLU()(conv1)
+
+        conv2 = keras.layers.Conv2D(f_out_2, 3, padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv2 = keras.layers.BatchNormalization(axis=1, scale=False)(conv2)
+        conv2 = keras.layers.ReLU()(conv2)
+
+        return keras.layers.Concatenate(axis=1)([conv1, conv2])
+
+    def _dual_downsample_factory(inp, f_out):
+        conv1 = keras.layers.Conv2D(f_out, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
+        conv1 = keras.layers.ReLU()(conv1)
+        
+        pool1 = keras.layers.MaxPooling2D(pool_size=[3, 3], strides=[2, 2], padding="same")(inp)
+
+        return keras.layers.Concatenate(axis=1)([conv1, pool1])
+
+    inp = keras.layers.Input(shape=(len(args["channels"]), args["image_width"], args["image_height"]))
+
+    conv1 = keras.layers.Conv2D(96, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+    conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
+    conv1 = keras.layers.ReLU()(conv1)
+
+    in3a = _dual_factory(conv1, 32, 32)
+    in3b = _dual_factory(in3a, 32, 48)
+    in3c = _dual_downsample_factory(in3b, 80)
+
+    in4a = _dual_factory(in3c, 112, 48)
+    in4b = _dual_factory(in4a, 96, 64)
+    in4c = _dual_factory(in4b, 80, 80)
+    in4d = _dual_factory(in4c, 48, 96)
+    in4e = _dual_downsample_factory(in4d, 96)
+
+    in5a = _dual_factory(in4e, 176, 160)
+    in5b = _dual_factory(in5a, 176, 160)
+
+    in6a = _dual_downsample_factory(in5b, 96)
+    in6b = _dual_factory(in6a, 176, 160)
+    in6c = _dual_factory(in6b, 176, 160)
+
+    flatten = keras.layers.Flatten(data_format="channels_first")(in6c)
+    fc1 = keras.layers.Dense(256, activation="relu", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(flatten)
+    soft = keras.layers.Dense(args["noc"], activation="softmax", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(fc1)
+
+    model = keras.models.Model(inputs=inp, outputs=soft)
+
+    return model
+
+
+def deepflow_narrow(args):
 
     def _dual_factory(inp, f_out_1, f_out_2):
         f_out_1 = int(f_out_1/2)
