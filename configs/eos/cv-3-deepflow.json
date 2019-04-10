@@ -8,7 +8,7 @@
     "channels": [1, 2, 6, 9],
     "meta": "eos/train_data_s23.csv",
     "split_dir": "eos_meta/s23_5fold",
-    "epochs": 50,
+    "epochs": 100,
     "model": "deepflow",
     "l2": 0.0005,
     "augmentation": 1,
@@ -16,9 +16,9 @@
     "es_patience": 20,
     "es_epsilon": 0.0001,
     "sample_weights": [1.0, 1.0, 1.0],
-    "learning_rate": 0.0001, 
+    "learning_rate": 1e-5, 
     "beta1": 0.9,
-    "epsilon": 1e-8,
+    "epsilon": 0.1,
     "optimizer": "adam",
     "h5_data": "eos/s23.h5"
 }
