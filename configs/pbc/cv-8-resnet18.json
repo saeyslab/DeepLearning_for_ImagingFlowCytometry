@@ -8,12 +8,15 @@
 "channels": [1, 6, 9],
 "meta": "9-color/train_data_earlyfix_d23.csv",
 "split_dir": "9-color_meta/earlyfix_d23_5fold",
-"epochs": 50,
+"epochs": 100,
 "model": "resnet18",
 "augmentation": 1,
 "comet_project": "cv-pbc-resnet18",
-"es_patience": 20,
+"es_patience": 30,
 "es_epsilon": 0.0001,
 "h5_data": "9-color/earlyfix_d23.h5",
-"optimizer": "adam_def"
+"optimizer": "adam",
+"learning_rate": 1e-5,
+"epsilon": 0.1,
+"beta1":0.9
 }

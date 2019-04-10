@@ -8,7 +8,7 @@
 "channels": [1, 2, 6, 9],
 "meta": "eos/train_data_s23.csv",
 "split_dir": "eos_meta/s23_5fold",
-"epochs": 50,
+"epochs": 100,
 "model": "resnet18",
 "augmentation": 1,
 "comet_project": "cv-eos-resnet18",
