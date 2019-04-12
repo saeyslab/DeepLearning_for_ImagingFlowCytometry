@@ -2,6 +2,7 @@ from tensorflow.keras import models
 import preprocessing
 import numpy as np
 import pickle
+from pathlib import Path
 
 def run(args, meta):
 
@@ -21,7 +22,9 @@ def run(args, meta):
     embedder = models.Model(inputs=model.inputs, outputs=outputs)
 
     data = preprocessing.load_hdf5_to_memory(args, meta["label"])
-    ds, ds_len = preprocessing.load_dataset(data, np.arange(meta.shape[0]), meta["label"], args, type="val")
+
+    idx = np.loadtxt(Path(args["split_dir"], "val.txt"), dtype=int)
+    ds, ds_len = preprocessing.load_dataset(data, idx, meta["label"], args, type="val")
 
     with open(args["embedding_output"], "wb") as pkl:
         for embedding in generator(embedder, ds, ds_len):

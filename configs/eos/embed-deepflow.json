@@ -1,5 +1,6 @@
 {
-    "model_hdf5": "eos/best-model-fold-2.h5",
+    "model_hdf5": "eos/df-best-model-fold-0.h5",
+    "split_dir": "eos_meta/s23_5fold_shuffled/0",
     "batch_size": 128,
     "channels": [1, 2, 6, 9],
     "h5_data": "eos/s23.h5",
@@ -8,6 +9,6 @@
     "image_height": 90,
     "noc": 3,
     "augmentation": 0,
-    "embedding_output": "embedding.pkl",
-    "layer": "dense_4"
+    "embedding_output": "embedding_df_s23_valfold0.pkl",
+    "layer": "dense"
 }
