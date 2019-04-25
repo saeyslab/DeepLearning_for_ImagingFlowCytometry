@@ -53,11 +53,18 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.map(lambda images, labels: (preprocess_batch(images, augment_func), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
-    elif type=="val":
-        X = generator(data, indices, shuffle=False)
-        ds = tf.data.Dataset.from_generator(
-            X, output_types=(tf.float32, tf.uint8)
-        )
+    elif (type=="val") or (type=="pred"):
+        if type =="val":
+            X = generator(data, indices, shuffle=False)
+            ds = tf.data.Dataset.from_generator(
+                X, output_types=(tf.float32, tf.uint8)
+            )
+        else:
+            X = (im for im in data.images)
+            ds = tf.data.Dataset.from_generator(
+                X, output_types=tf.float32
+            )
+
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.prefetch(16)
     else:

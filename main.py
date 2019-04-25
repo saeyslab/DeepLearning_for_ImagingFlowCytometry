@@ -6,6 +6,7 @@ import functions.param
 import functions.train
 import functions.cv
 import functions.embed
+import functions.predict
 import pandas as pd
 import sys
 import json
@@ -57,7 +58,7 @@ def main():
         functions.cv.run(args, meta)
 
     def predict():
-        raise NotImplementedError()
+        functions.predict.run(args, meta)
 
     def param():
         functions.param.run(args, meta)
