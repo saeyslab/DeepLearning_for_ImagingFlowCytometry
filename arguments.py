@@ -75,7 +75,7 @@ def get_args():
     if "sample_weights" in args:
         if len(args["sample_weights"]) != args["noc"]:
             raise ValueError("Length of provided sample weights does not equal number of classes.")
-    else:
+    elif "noc" in args:
         args["sample_weights"] = [1.0]*args["noc"]
 
     for k in ["meta", "split_dir", "h5_data", "model_hdf5"]:
