@@ -19,7 +19,7 @@ def run(args, meta):
     preds = m.predict(
         ds,
         batch_size=args["batch_size"],
-        steps_per_epoch=int(np.ceil(ds_len/args["batch_size"])),
+        steps=int(np.ceil(ds_len/args["batch_size"])),
     )
 
     np.save("predictions.npy", preds)
