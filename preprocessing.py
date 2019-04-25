@@ -30,6 +30,16 @@ class generator:
         for idx in self.indices:
             yield self.data.images[:, idx, :, :], self.data.labels[idx]
 
+
+class pred_generator:
+    def __init__(self, data):
+        self.data = data
+
+    def __call__(self):
+        for idx in range(self.data.images.shape[1]):
+            yield self.data.images[:, idx, :, :]        
+
+
 def preprocess_batch(batch, aug):
     return tf.map_fn(
         aug, batch,
@@ -60,7 +70,7 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
                 X, output_types=(tf.float32, tf.uint8)
             )
         else:
-            X = (im for im in data.images)
+            X = pred_generator(data)
             ds = tf.data.Dataset.from_generator(
                 X, output_types=tf.float32
             )
