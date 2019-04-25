@@ -69,7 +69,8 @@ def get_args():
                 if k not in valid_args:
                     raise ValueError("%s from param_grid is not a valid argument" % k)
 
-    args["augmentation"] = args["augmentation"] == 1
+    if "augmentation" in args:
+        args["augmentation"] = args["augmentation"] == 1
 
     if "sample_weights" in args:
         if len(args["sample_weights"]) != args["noc"]:
