@@ -69,18 +69,20 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
             ds = tf.data.Dataset.from_generator(
                 X, output_types=(tf.float32, tf.uint8)
             )
+            ds_length = len(indices)
         else:
             X = pred_generator(data)
             ds = tf.data.Dataset.from_generator(
                 X, output_types=tf.float32
             )
+            ds_length = data.images.shape[1]
 
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.prefetch(16)
     else:
         raise RuntimeError("Wrong argument value (%s)" % type)
 
-    return ds, len(indices)
+    return ds, ds_length
 
 def load_hdf5_to_memory(args, labels):
     with h5py.File(args["h5_data"]) as h5fp:    
