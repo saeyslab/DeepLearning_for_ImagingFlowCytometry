@@ -12,7 +12,7 @@ def run(args, meta):
 
     with tf.device("/cpu:0"): 
         data = preprocessing.load_hdf5_to_memory(args, None)
-        ds, ds_len = preprocessing.load_dataset(data, None, None, args)
+        ds, ds_len = preprocessing.load_dataset(data, None, None, args, type="pred")
     
     m = tf.keras.models.load_model(args["model_hdf5"], compile=False)
     
