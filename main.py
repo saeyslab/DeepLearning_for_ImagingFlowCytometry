@@ -44,6 +44,11 @@ def prerun(args, run_dir=True, exp=True):
 def main():
   
     args = arguments.get_args()
+    
+    from tensorflow.keras.backend import set_session
+    config = tf.ConfigProto()
+    config.gpu_options.per_process_gpu_memory_fraction = args["gpu_mem_fraction"]
+    set_session(tf.Session(config=config))
 
     meta = pd.read_csv(args["meta"])
         
@@ -80,4 +85,5 @@ def main():
 
 if __name__ == "__main__":
     tf.enable_eager_execution()
+
     main()

@@ -10,5 +10,6 @@
     "noc": 3,
     "augmentation": 0,
     "embedding_output": "embedding_df_s12_valfold0.pkl",
-    "layer": "dense"
+    "layer": "dense",
+    "gpu_mem_fraction": 0.3
 }

@@ -55,7 +55,8 @@ def get_args():
             "skip_n_folds",
             "model_hdf5",
             "embedding_output",
-            "layer"
+            "layer",
+            "gpu_mem_fraction"
         ]
 
     for k, v in json_args.items():
@@ -68,6 +69,9 @@ def get_args():
             for k, _ in params.items():
                 if k not in valid_args:
                     raise ValueError("%s from param_grid is not a valid argument" % k)
+
+    if "gpu_mem_fraction" not in args:
+        args["gpu_mem_fraction"] = 1.0
 
     if "augmentation" in args:
         args["augmentation"] = args["augmentation"] == 1
