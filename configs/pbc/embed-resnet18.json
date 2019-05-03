@@ -10,5 +10,5 @@
     "noc": 8,
     "augmentation": 0,
     "embedding_output": "embedding_rn_d23_valfold0.pkl",
-    "layer": "dense"
+    "layer": "flatten"
 }
