@@ -4,11 +4,12 @@
     "batch_size": 128,
     "channels": [1, 6, 9],
     "h5_data": "9-color/earlyfix_d23.h5",
-    "meta": "9-color/train_data_earlyfix_d23.csv",
+    "meta": "9-color/d34_ideas.csv",
     "image_width": 90,
     "image_height": 90,
     "noc": 8,
     "augmentation": 0,
-    "embedding_output": "embedding_rn_d23_valfold0.pkl",
-    "layer": "flatten"
+    "embedding_output": "embedding_rn_d34_valfold0.pkl",
+    "layer": "flatten",
+    "gpu_mem_fraction": 0.3
 }
