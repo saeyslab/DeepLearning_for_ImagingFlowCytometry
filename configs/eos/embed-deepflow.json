@@ -1,15 +1,15 @@
 {
-    "model_hdf5": "eos/df-best-model-fold-0.h5",
+    "model_hdf5": "eos/df-best-model-fold-0-3chan.h5",
     "split_dir": "eos_meta/s12_5fold_shuffled/0",
     "batch_size": 128,
-    "channels": [1, 2, 6, 9],
+    "channels": [1, 6, 9],
     "h5_data": "eos/s12.h5",
     "meta": "eos/s12_ideas.csv",
     "image_width": 90,
     "image_height": 90,
     "noc": 3,
     "augmentation": 0,
-    "embedding_output": "embedding_df_s12_valfold0.pkl",
+    "embedding_output": "embedding_df_s12_valfold0-3chan.pkl",
     "layer": "dense",
     "gpu_mem_fraction": 0.3
 }
