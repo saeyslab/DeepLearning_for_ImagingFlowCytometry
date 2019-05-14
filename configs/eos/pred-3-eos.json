@@ -1,0 +1,11 @@
+{
+    "batch_size": 128,
+    "image_width": 90,
+    "image_height": 90,
+    "channels": [1, 6, 9],
+    "meta": "eos/s12_ideas.csv",
+    "h5_data": "eos/eos_1/off/exvivo/Ex vivo Stained lasers off_2_all_features_focused & Single cells.h5",
+    "model_hdf5": "/home/maximl/runs/simple_nn/eos/deepflow/s12_3chan/best-model-fold-0.h5",
+    "gpu_mem_fraction": 0.3
+}
+

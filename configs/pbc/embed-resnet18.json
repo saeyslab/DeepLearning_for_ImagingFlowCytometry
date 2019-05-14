@@ -3,7 +3,7 @@
     "split_dir": "9-color_meta/d23_5fold_shuffled/0",
     "batch_size": 128,
     "channels": [1, 6, 9],
-    "h5_data": "9-color/earlyfix_d23.h5",
+    "h5_data": "9-color/earlyfix_d34.h5",
     "meta": "9-color/d34_ideas.csv",
     "image_width": 90,
     "image_height": 90,

@@ -19,5 +19,6 @@
 "beta1": 0.9,
 "epsilon": 0.1,
 "h5_data": "eos/s12.h5",
-"optimizer": "adam"
+"optimizer": "adam",
+"gpu_mem_fraction": 0.45
 }
