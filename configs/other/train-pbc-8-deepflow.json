@@ -6,8 +6,8 @@
 "freq_type": "epoch",
 "noc": 8,
 "channels": [1, 6, 9],
-"meta": "9-color/9-color 2/earlyfix_set1/train_data.csv",
-"split_dir": "9-color_meta/s123_5fold/0",
+"meta": "9-color/9-color 3/earlyfix_set1/train_data.csv",
+"split_dir": "9-color_meta/s12_5fold/0",
 "epochs": 50,
 "model_hdf5": "",
 "model": "deepflow",
@@ -16,6 +16,6 @@
 "comet_project": "train-pbc-deepflow",
 "es_patience": 20,
 "es_epsilon": 0.0001,
-"h5_data": "9-color/9-color 2/earlyfix_set1/BD lyse fix 1_1_CD56+ NK Cells & Focused & Singlets & CD45 pos and etc.h5",
+"h5_data": "9-color/9-color 3/earlyfix_set1/BD lyse fix 1_1_CD56+ NK Cells & Focused & Singlets & CD45 pos and etc.h5",
 "optimizer": "adam_def"
 }

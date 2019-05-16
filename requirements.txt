@@ -1,5 +1,5 @@
-# tensorflow-gpu
-tensorflow
+tensorflow-gpu
+# tensorflow
 numpy
 pandas
 scikit-learn
