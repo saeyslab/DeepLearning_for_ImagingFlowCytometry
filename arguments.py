@@ -56,7 +56,10 @@ def get_args():
             "model_hdf5",
             "embedding_output",
             "layer",
-            "gpu_mem_fraction"
+            "gpu_mem_fraction",
+            "dense_layers",
+            "dense_blocks",
+            "compression"
         ]
 
     for k, v in json_args.items():

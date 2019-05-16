@@ -48,6 +48,7 @@ def main():
     from tensorflow.keras.backend import set_session
     config = tf.ConfigProto()
     config.gpu_options.per_process_gpu_memory_fraction = args["gpu_mem_fraction"]
+    config.gpu_options.allow_growth = True
     set_session(tf.Session(config=config))
 
     meta = pd.read_csv(args["meta"])

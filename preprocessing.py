@@ -133,7 +133,7 @@ if __name__ == "__main__":
     import arguments
     from pathlib import Path
     import pandas as pd
-    from matplotlib import pyplot as plt
+    # from matplotlib import pyplot as plt
 
     args = arguments.get_args()
     meta = pd.read_csv(args["meta"])
@@ -147,10 +147,13 @@ if __name__ == "__main__":
 
     it = iter(ds)
 
-    images, labels = next(it)
-    print(images.shape)
-    plt.imshow(images[0][0])
-    plt.savefig("test.png")
+    for i in range(5):
+        images, labels = next(it)
+        print(Counter(labels.numpy()))
+
+    # print(images.shape)
+    # plt.imshow(images[0][0])
+    # plt.savefig("test.png")
 
     it = None
 

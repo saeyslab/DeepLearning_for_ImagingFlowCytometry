@@ -4,6 +4,7 @@ import metrics
 import models.simple
 import models.deepflow
 import models.resnet
+import models.densenet
 
 def model_map(key):
     return {
@@ -13,7 +14,8 @@ def model_map(key):
         "deepflow": models.deepflow.deepflow,
         "deepflow_narrow": models.deepflow.deepflow_narrow,
         "resnet50": resnet50,
-        "resnet18": resnet18
+        "resnet18": resnet18,
+        "densenet": densenet
     }[key]
 
 
@@ -74,3 +76,15 @@ def resnet18(args):
     model = models.resnet.ResnetBuilder.build_resnet_18(s, args["noc"])
 
     return model
+
+def densenet(args):
+    s = (len(args["channels"]), args["image_width"], args["image_height"])
+    builder = models.densenet.DenseNet(
+        input_shape=s, 
+        dense_blocks=args["dense_blocks"],
+        dense_layers=args["dense_layers"],
+        nb_classes=args["noc"],
+        compression=args["compression"],
+        dropout_rate=args["dropout"] 
+    )
+    return builder.build_model()

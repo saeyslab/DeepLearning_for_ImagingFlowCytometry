@@ -1,0 +1,23 @@
+{
+"batch_size" : 64,
+"image_width": 90,
+"image_height": 90,
+"update_freq": 1,
+"freq_type": "epoch",
+"noc": 8,
+"channels": [1, 6, 9],
+"meta": "9-color/9-color 3/earlyfix_set1/train_data.csv",
+"split_dir": "9-color_meta/s12_5fold/0",
+"epochs": 50,
+"model": "densenet",
+"augmentation": 1,
+"comet_project": "train-pbc-deepflow",
+"es_patience": 20,
+"es_epsilon": 0.0001,
+"h5_data": "9-color/9-color 3/earlyfix_set1/BD lyse fix 1_1_CD56+ NK Cells & Focused & Singlets & CD45 pos and etc.h5",
+"optimizer": "adam_def",
+"dense_blocks": 2,
+"dense_layers": 2,
+"compression": 0.5,
+"dropout":0.2
+}
