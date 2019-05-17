@@ -31,19 +31,21 @@ def run(args, meta, id_=100, exp=None, new_run_dir=True, data=None):
     if exp is None:
         exp = main.prerun(args, run_dir=new_run_dir, exp=True)
     
-    # tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args["batch_size"], write_graph=True, write_grads=True, write_images=True)
+    tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args["batch_size"], write_graph=True, write_grads=True, write_images=True)
 
     cb = [
+        tb,
         tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
-        # tb,
         my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_, exp)
     ]
 
-    m = model.build_model(args)        
+    m = model.build_model(args)
+    tb.set_model(m)
+
     hist = m.fit(
         train_ds,
         epochs=args["epochs"], 
-        steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
+        steps_per_epoch=10,#int(np.ceil(train_len/args["batch_size"])),
         callbacks=cb
     )
 

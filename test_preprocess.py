@@ -68,7 +68,6 @@ def load_dataset(data, indices, labels, cache_file, type="train", augment_func =
 
 if __name__ == "__main__":
     from collections import Counter
-    tf.enable_eager_execution()
 
     h5 = "/home/maximl/DATA/Experiment_data/9-color/s123.h5"
     meta = pd.read_csv("/home/maximl/DATA/Experiment_data/9-color/train_data_no_images.csv")

@@ -1,5 +1,6 @@
-tensorflow-gpu
+tensorflow-gpu==2.0.0-alpha
 # tensorflow
+tensorflow_addons
 numpy
 pandas
 scikit-learn

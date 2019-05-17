@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import numpy as np
 import h5py
+import tensorflow_addons as tfa
 
 class dataset_wrapper:
     def __init__(self, h5fp, labels, channels):
@@ -109,26 +110,23 @@ def load_datasets(train_indices, val_indices, meta, args, augment_func, data=Non
 def apply_augmentation(image):
     image = tf.transpose(image, [1, 2, 0])
 
-    angle = tf.random_uniform([], -3.14, 3.14, tf.float32, None, "angle")
-    dx = tf.random_uniform([], -6, 6, tf.float32)
-    dy = tf.random_uniform([], -6, 6, tf.float32)
-
     # Randomly flip the image horizontally.
     distorted_image = tf.image.random_flip_left_right(image)
     # Randomly flip the image vertically.
     distorted_image = tf.image.random_flip_up_down(distorted_image)
     # Randomly rotate the image
-    distorted_image = tf.contrib.image.rotate(distorted_image, angle)
+    angle = tf.random.uniform([], -3.14, 3.14, tf.float32, None, "angle")
+    distorted_image = tfa.image.transform_ops.rotate(distorted_image, angle)
 
-    distorted_image = tf.contrib.image.translate(distorted_image, [dx, dy])
+    dx = tf.random.uniform([], -6, 6, tf.float32)
+    dy = tf.random.uniform([], -6, 6, tf.float32)
+    distorted_image = tfa.image.transform_ops.transform(distorted_image, [dx, 0, 0, 0, dy, 0, 0, 0])
 
     distorted_image = tf.transpose(distorted_image, [2, 0, 1])
     return distorted_image
 
 
 if __name__ == "__main__":
-    tf.enable_eager_execution()
-
     from collections import Counter
     import arguments
     from pathlib import Path

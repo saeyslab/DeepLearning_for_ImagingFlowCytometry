@@ -45,11 +45,8 @@ def main():
   
     args = arguments.get_args()
     
-    from tensorflow.keras.backend import set_session
-    config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = args["gpu_mem_fraction"]
-    config.gpu_options.allow_growth = True
-    set_session(tf.Session(config=config))
+    tf.config.gpu.set_per_process_memory_fraction(args["gpu_mem_fraction"])
+    tf.config.gpu.set_per_process_memory_growth(True)
 
     meta = pd.read_csv(args["meta"])
         
@@ -85,6 +82,6 @@ def main():
 
 
 if __name__ == "__main__":
-    tf.enable_eager_execution()
+    # tf.enable_eager_execution()
 
     main()
