@@ -12,8 +12,6 @@ def run(args, meta):
     data = preprocessing.load_hdf5_to_memory(args, meta["label"].values)
 
     def do(i, orig, d):
-        tf.enable_eager_execution()
-
         args_copy = orig.copy()
         args_copy["split_dir"] = str(d)
 

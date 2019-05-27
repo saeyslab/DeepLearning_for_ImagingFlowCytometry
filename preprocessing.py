@@ -116,11 +116,11 @@ def apply_augmentation(image):
     distorted_image = tf.image.random_flip_up_down(distorted_image)
     # Randomly rotate the image
     angle = tf.random.uniform([], -3.14, 3.14, tf.float32, None, "angle")
-    distorted_image = tfa.image.transform_ops.rotate(distorted_image, angle)
+    # distorted_image = tfa.image.transform_ops.rotate(distorted_image, angle)
 
     dx = tf.random.uniform([], -6, 6, tf.float32)
     dy = tf.random.uniform([], -6, 6, tf.float32)
-    distorted_image = tfa.image.transform_ops.transform(distorted_image, [dx, 0, 0, 0, dy, 0, 0, 0])
+    # distorted_image = tfa.image.transform_ops.transform(distorted_image, [dx, 0, 0, 0, dy, 0, 0, 0])
 
     distorted_image = tf.transpose(distorted_image, [2, 0, 1])
     return distorted_image

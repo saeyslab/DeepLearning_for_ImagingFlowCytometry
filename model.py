@@ -20,34 +20,34 @@ def model_map(key):
 
 
 def optimizer_map(key):
-    def get_decay_mom(args):
-        lr = tf.train.exponential_decay(
-            args["learning_rate"],
-            tf.train.get_or_create_global_step(),
-            args["epochs_per_decay"],
-            args["learning_rate_decay"],
-            staircase=True
-        )
+    # def get_decay_mom(args):
+    #     lr = tf.train.exponential_decay(
+    #         args["learning_rate"],
+    #         tf.train.get_or_create_global_step(),
+    #         args["epochs_per_decay"],
+    #         args["learning_rate_decay"],
+    #         staircase=True
+    #     )
 
-        return tf.train.MomentumOptimizer(lr, args["momentum"])
+    #     return tf.keras.optimizers.Momentum(lr, args["momentum"])
 
-    def get_mom(args):
-        return tf.train.MomentumOptimizer(args["learning_rate"], args["momentum"])
+    # def get_mom(args):
+    #     return tf.keras.optimizers.Momentum(args["learning_rate"], args["momentum"])
 
     def get_adam(args):
-        return tf.train.AdamOptimizer(learning_rate=args["learning_rate"], beta1=args["beta1"], epsilon=args["epsilon"])
+        return tf.keras.optimizers.Adam(lr=args["learning_rate"], beta_1=args["beta1"], epsilon=args["epsilon"])
 
     def get_adam_def(args):
-        return tf.train.AdamOptimizer()
+        return tf.keras.optimizers.Adam()
 
     def get_rmsprop(args):
-        return tf.train.RMSPropOptimizer(args["learning_rate"], momentum=args["momentum"])
+        return tf.keras.optimizers.RMSProp(args["learning_rate"], momentum=args["momentum"])
 
     return {
         "adam": get_adam,
         "adam_def": get_adam_def,
-        "mom_decay": get_decay_mom,
-        "mom": get_mom,
+        # "mom_decay": get_decay_mom,
+        # "mom": get_mom,
         "rmsprop": get_rmsprop
     }[key]
 

@@ -16,8 +16,6 @@ def run(args, meta):
     grid_iterator = model_selection.ParameterGrid(param_grid)
 
     def do(i, orig, gridpoint):
-        tf.enable_eager_execution()
-
         args_copy = orig.copy()
         args_copy.update(gridpoint)
 

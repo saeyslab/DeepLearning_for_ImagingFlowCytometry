@@ -31,7 +31,7 @@ def run(args, meta, id_=100, exp=None, new_run_dir=True, data=None):
     if exp is None:
         exp = main.prerun(args, run_dir=new_run_dir, exp=True)
     
-    tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, batch_size=args["batch_size"], write_graph=True, write_grads=True, write_images=True)
+    tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, write_graph=True, write_images=True)
 
     cb = [
         tb,

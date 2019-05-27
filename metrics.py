@@ -7,7 +7,7 @@ class BalancedAccuracy(object):
         self.noc = noc
 
     def balanced_accuracy(self, y_true, y_pred):
-        confusion_matrix = tf.confusion_matrix(y_true, tf.argmax(y_pred, axis=1), num_classes=self.noc)
-        diag = tf.diag_part(confusion_matrix)
-        rowsums = tf.reduce_sum(confusion_matrix, axis=1)
-        return tf.keras.backend.mean(diag/rowsums)
+        confusion_matrix = tf.math.confusion_matrix(y_true, tf.argmax(y_pred, axis=1), num_classes=self.noc)
+        diag = tf.linalg.diag_part(confusion_matrix)
+        rowsums = tf.math.reduce_sum(confusion_matrix, axis=1)
+        return tf.math.reduce_mean(diag/rowsums, axis=0)

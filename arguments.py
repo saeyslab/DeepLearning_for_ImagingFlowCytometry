@@ -11,8 +11,14 @@ def get_args():
     parser.add_argument("run_dir", type=str)
     parser.add_argument("root", type=str)
     parser.add_argument("--overwrite", type=str, default="{}")
+    parser.add_argument("--rm", action='store_true')
     
     args = vars(parser.parse_args())
+    
+    if args["rm"]:
+        if Path(args["run_dir"]).exists():
+            import shutil
+            shutil.rmtree(args["run_dir"])
 
     with open(args["config"]) as f:
         json_args = json.load(f)
