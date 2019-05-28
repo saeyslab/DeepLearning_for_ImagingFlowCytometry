@@ -16,8 +16,8 @@
 "es_epsilon": 0.0001,
 "h5_data": "9-color/earlyfix_d34.h5",
 "optimizer": "adam_def",
-"dense_blocks": 3,
-"dense_layers": 2,
+"dense_blocks": 4,
+"dense_layers": 3,
 "compression": 0.5,
 "dropout":0.2
 }
