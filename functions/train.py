@@ -31,7 +31,7 @@ def run(args, meta, model, callbacks, exp, id_=100, data=None):
     hist = model.fit(
         train_ds,
         epochs=args["epochs"], 
-        steps_per_epoch=10,#int(np.ceil(train_len/args["batch_size"])),
+        steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
         callbacks=callbacks
     )
 
