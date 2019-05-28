@@ -8,7 +8,7 @@
 "channels": [1, 6, 9],
 "meta": "test/test_1/meta.csv",
 "split_dir": "test_meta/s1_5fold",
-"epochs": 50,
+"epochs": 3,
 "model": "densenet",
 "augmentation": 1,
 "comet_project": "train-pbc-deepflow",

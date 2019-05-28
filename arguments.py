@@ -82,6 +82,9 @@ def get_args():
     if "gpu_mem_fraction" not in args:
         args["gpu_mem_fraction"] = 1.0
 
+    if "skip_n_folds" not in args:
+        args["skip_n_folds"] = 0
+
     if "augmentation" in args:
         args["augmentation"] = args["augmentation"] == 1
 

@@ -12,6 +12,9 @@ import sys
 import json
 
 import tensorflow as tf
+from tensorflow.keras import callbacks as tf_callbacks
+from tensorflow.keras.backend import set_session
+import callbacks as my_callbacks
 
 def prerun(args, run_dir=True, exp=True):
     if run_dir:
@@ -40,6 +43,23 @@ def prerun(args, run_dir=True, exp=True):
     else:
         return None
 
+def make_callbacks_and_model(args, tb=True):
+    run = args["run_dir"]
+
+    cb = [
+        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
+        my_callbacks.ValidationMonitor(Path(run, "scores.log"), args)
+    ]
+
+    m = model.build_model(args)
+    
+    if tb:
+        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=1, profile_batch=3, write_graph=True, write_grads=True)
+        tb.set_model(m)
+        cb.append(tb)
+
+    return cb, m
+
 
 def main():
   
@@ -55,10 +75,16 @@ def main():
         m.summary()
 
     def train():
-        functions.train.run(args, meta)
+        experiment = prerun(args)
+        callbacks, model = make_callbacks_and_model(args)
+        functions.train.run(args, meta, model, callbacks, experiment)
 
     def cv():
-        functions.cv.run(args, meta)
+        new_run_dir = args["skip_n_folds"] == 0
+        experiment = prerun(args, run_dir=new_run_dir)
+
+        callbacks, model = make_callbacks_and_model(args, tb=False)
+        functions.cv.run(args, meta, model, callbacks, experiment, skip_n_folds=args["skip_n_folds"])
 
     def predict():
         functions.predict.run(args, meta)

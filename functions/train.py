@@ -7,8 +7,6 @@ import numpy as np
 from pathlib import Path
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import callbacks as tf_callbacks
-from tensorflow.keras.backend import set_session
 
 import sys
 
@@ -23,30 +21,18 @@ def prerun(args, meta, data):
 
     return train_ds, val_ds, train_len, validation_len
 
-def run(args, meta, id_=100, exp=None, new_run_dir=True, data=None):
+def run(args, meta, model, callbacks, exp, id_=100, data=None):
     train_ds, val_ds, train_len, validation_len = prerun(args, meta, data)
-
-    run = args["run_dir"]
     
-    if exp is None:
-        exp = main.prerun(args, run_dir=new_run_dir, exp=True)
-    
-    tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=None, write_graph=True, write_images=True)
+    for cb in callbacks:
+        if type(cb)==my_callbacks.ValidationMonitor:
+            cb.set(val_ds, validation_len, id_, exp)
 
-    cb = [
-        tb,
-        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
-        my_callbacks.ValidationMonitor(val_ds, validation_len, Path(run, "scores.log"), args, id_, exp)
-    ]
-
-    m = model.build_model(args)
-    tb.set_model(m)
-
-    hist = m.fit(
+    hist = model.fit(
         train_ds,
         epochs=args["epochs"], 
-        steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
-        callbacks=cb
+        steps_per_epoch=10,#int(np.ceil(train_len/args["batch_size"])),
+        callbacks=callbacks
     )
 
     return hist

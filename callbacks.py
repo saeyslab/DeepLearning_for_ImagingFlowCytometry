@@ -10,7 +10,7 @@ import pickle
 
 class ValidationMonitor(keras.callbacks.Callback):
 
-    def __init__(self, ds, ds_size, logfile, args, fold, experiment):
+    def __init__(self, logfile, args):
 
         # early stopping vars
         self.epsilon = args["es_epsilon"]
@@ -19,21 +19,23 @@ class ValidationMonitor(keras.callbacks.Callback):
         self.max_index = None
         self.max_cm = None
         self.max = None
-
-        # ds vars
-        self.ds = ds
-        self.ds_size = ds_size
         
-        self.log = open(logfile, mode="at+", buffering=1)
+        self.logfile = logfile
         self.epoch = 0
         self.batch = 0
         self.args = args
-        self.fold = fold
         self.history = {}
         self.runcount = 0
-        self.experiment = experiment
 
+    def set(self, ds, ds_size, fold, exp):
+        self.log = open(self.logfile, mode="at+", buffering=1)
+        self.ds = ds
+        self.ds_size = ds_size
+        self.fold = fold
+        self.experiment = exp
+        
         self.log.write("TRAINING FOLD %d\n" % self.fold)
+
 
     def log_in_history(self, logs):
         for k, v in logs.items():
@@ -43,6 +45,8 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.experiment.log_metrics(logs)
 
     def do(self, logs):
+        if not hasattr(self, 'ds'):
+            raise ValueError("ValidationMonitor not initialized: validation dataset not set.")
 
         all_labels = np.empty((self.ds_size,), dtype=int)
         all_preds = np.empty((self.ds_size,), dtype=int)
