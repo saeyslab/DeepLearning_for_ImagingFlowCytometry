@@ -12,27 +12,27 @@ class ValidationMonitor(keras.callbacks.Callback):
 
     def __init__(self, logfile, args):
 
-        # early stopping vars
         self.epsilon = args["es_epsilon"]
         self.wait = 0
         self.patience = args["es_patience"]
-        self.max_index = None
-        self.max_cm = None
-        self.max = None
-        
         self.logfile = logfile
-        self.epoch = 0
-        self.batch = 0
         self.args = args
-        self.history = {}
-        self.runcount = 0
-
+        
     def set(self, ds, ds_size, fold, exp):
         self.log = open(self.logfile, mode="at+", buffering=1)
         self.ds = ds
         self.ds_size = ds_size
         self.fold = fold
         self.experiment = exp
+        
+        self.max_index = None
+        self.max_cm = None
+        self.max = None
+        
+        self.epoch = 0
+        self.batch = 0
+        self.history = {}
+        self.runcount = 0
         
         self.log.write("TRAINING FOLD %d\n" % self.fold)
 
