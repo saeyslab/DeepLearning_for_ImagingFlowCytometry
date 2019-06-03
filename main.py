@@ -97,7 +97,7 @@ def main():
         functions.embed.run(args, meta)
 
     def tb_embed():
-        functions.tf_embed.run(args, meta)
+        functions.tb_embed.run(args, meta)
 
     function_map = {
         "train": train,
