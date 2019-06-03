@@ -11,6 +11,7 @@ import functions.predict
 import pandas as pd
 import sys
 import json
+import socket
 
 import tensorflow as tf
 from tensorflow.keras import callbacks as tf_callbacks
@@ -35,7 +36,7 @@ def prerun(args, run_dir=True, exp=True):
             auto_metric_logging=True,
             auto_param_logging=False,
             log_graph=True,
-            disabled=True
+            disabled="maximl" not in socket.gethostname() # disable on dev machine
         )
 
         experiment.log_parameters(args)
