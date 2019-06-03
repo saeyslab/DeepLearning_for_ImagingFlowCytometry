@@ -11,7 +11,7 @@
 "epochs": 50,
 "model": "densenet",
 "augmentation": 1,
-"comet_project": "train-pbc-deepflow",
+"comet_project": "cv-pbc-deepflow",
 "es_patience": 20,
 "es_epsilon": 0.0001,
 "h5_data": "9-color/earlyfix_d34.h5",
