@@ -21,5 +21,5 @@
 "compression": 0.5,
 "dropout":0.2,
 "l2": 0.0005,
-"growth_rate": 2
+"growth_rate": 12
 }
