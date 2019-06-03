@@ -63,8 +63,6 @@ def build_model(args):
         metrics=[bal_acc]
     )
 
-    print(m)
-
     return m
 
 def resnet50(args):
@@ -97,7 +95,7 @@ def densenet(args):
         data_format=tf.keras.backend.image_data_format()
     )
     
-    m.build(tuple([128] + s))
+    # m.build(tuple([128] + s))
 
     return m
 

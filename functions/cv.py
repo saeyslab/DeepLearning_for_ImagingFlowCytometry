@@ -35,7 +35,8 @@ def run(args, meta, model, callbacks, experiment, skip_n_folds=0):
                     found = True
                     cb.log_dir = str(tb_log_dir)
             if not found:
-                tb = tf_callbacks.TensorBoard(log_dir=tb_log_dir, histogram_freq=1, profile_batch=3, write_graph=True, write_grads=True)
+                tb = tf_callbacks.TensorBoard(log_dir=tb_log_dir, histogram_freq=1, profile_batch=3, write_graph=True)
+                tb.set_model(model)
                 callbacks.append(tb)
 
             do(i, args, d)
