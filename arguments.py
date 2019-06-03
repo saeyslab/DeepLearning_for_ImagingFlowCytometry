@@ -94,7 +94,7 @@ def get_args():
     elif "noc" in args:
         args["sample_weights"] = [1.0]*args["noc"]
 
-    for k in ["meta", "split_dir", "h5_data", "model_hdf5"]:
+    for k in ["meta", "split_dir", "h5_data"]:
         if k in args:
             args[k] = str(Path(args["root"], args[k]))
             if not Path(args[k]).exists():

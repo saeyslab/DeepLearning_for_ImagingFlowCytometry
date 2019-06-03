@@ -6,6 +6,7 @@ import functions.param
 import functions.train
 import functions.cv
 import functions.embed
+import functions.tb_embed
 import functions.predict
 import pandas as pd
 import sys
@@ -95,13 +96,17 @@ def main():
     def embed():
         functions.embed.run(args, meta)
 
+    def tb_embed():
+        functions.tf_embed.run(args, meta)
+
     function_map = {
         "train": train,
         "cv": cv,
         "predict": predict,
         "summary": summary,
         "param": param,
-        "embed": embed
+        "embed": embed,
+        "tb_embed": tb_embed
     }
     
     function_map[args["function"]]()

@@ -1,0 +1,15 @@
+{
+"batch_size" : 128,
+"image_width": 90,
+"image_height": 90,
+"update_freq": 1,
+"freq_type": "epoch",
+"noc": 8,
+"channels": [1, 6, 9],
+"meta": "test/test_1/meta.csv",
+"split_dir": "test_meta/s1_5fold/0",
+"model": "deepflow",
+"h5_data": "test/test_1/input.h5",
+"optimizer": "adam_def",
+"model_hdf5": "weights/deepflow-wbc-bfdf.h5"
+}
