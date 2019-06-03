@@ -36,7 +36,7 @@ def prerun(args, run_dir=True, exp=True):
             auto_metric_logging=True,
             auto_param_logging=False,
             log_graph=True,
-            disabled="maximl" not in socket.gethostname() # disable on dev machine
+            disabled="maximl" in socket.gethostname() # disable on dev machine
         )
 
         experiment.log_parameters(args)
