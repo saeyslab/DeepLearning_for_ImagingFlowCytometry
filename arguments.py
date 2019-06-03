@@ -65,7 +65,8 @@ def get_args():
             "gpu_mem_fraction",
             "dense_layers",
             "dense_blocks",
-            "compression"
+            "compression",
+            "growth_rate"
         ]
 
     for k, v in json_args.items():

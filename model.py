@@ -63,6 +63,8 @@ def build_model(args):
         metrics=[bal_acc]
     )
 
+    print(m)
+
     return m
 
 def resnet50(args):
@@ -78,13 +80,25 @@ def resnet18(args):
     return model
 
 def densenet(args):
-    s = (len(args["channels"]), args["image_width"], args["image_height"])
-    builder = models.densenet.DenseNet(
-        input_shape=s, 
-        dense_blocks=args["dense_blocks"],
-        dense_layers=args["dense_layers"],
-        nb_classes=args["noc"],
+    s = [len(args["channels"]), args["image_width"], args["image_height"]]
+    m = models.densenet.DenseNet(
+        input_shape=tuple(s),
+        num_of_blocks=args["dense_blocks"],
+        num_layers_in_each_block=args["dense_layers"],
+        output_classes=args["noc"],
         compression=args["compression"],
-        dropout_rate=args["dropout"] 
+        dropout_rate=args["dropout"],
+        growth_rate=args["growth_rate"],
+        weight_decay=args["l2"],
+        pool_initial=False,
+        include_top=True,
+        bottleneck=False,
+        depth_of_model=None,
+        data_format=tf.keras.backend.image_data_format()
     )
-    return builder.build_model()
+    
+    m.build(tuple([128] + s))
+
+    return m
+
+
