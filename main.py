@@ -74,6 +74,9 @@ def main():
         
     def summary():
         m = model.model_map(args["model"])(args)
+        s = tuple([None, len(args["channels"]), args["image_width"], args["image_height"]])
+        m.build(s)
+
         m.summary()
 
     def train():
