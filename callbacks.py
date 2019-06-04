@@ -42,6 +42,9 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.history.setdefault(k, []).append(v)
 
         if self.experiment is not None:
+            logs_copy = logs.copy()
+            logs_copy["val_confusion_matrix"] = str(logs_copy["val_confusion_matrix"])
+
             self.experiment.log_metrics(logs)
 
     def do(self, logs):
