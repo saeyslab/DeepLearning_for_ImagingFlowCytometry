@@ -45,7 +45,7 @@ class ValidationMonitor(keras.callbacks.Callback):
             logs_copy = logs.copy()
             logs_copy["val_confusion_matrix"] = str(logs_copy["val_confusion_matrix"])
 
-            self.experiment.log_metrics(logs)
+            self.experiment.log_metrics(logs_copy)
 
     def do(self, logs):
         if not hasattr(self, 'ds'):
