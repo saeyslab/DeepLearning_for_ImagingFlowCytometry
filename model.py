@@ -92,7 +92,7 @@ def densenet(args):
         weight_decay=args["l2"],
         pool_initial=False,
         include_top=True,
-        bottleneck=False,
+        bottleneck=args["bottleneck"],
         depth_of_model=None if "model_depth" not in args else args["model_depth"],
         data_format=tf.keras.backend.image_data_format()
     )

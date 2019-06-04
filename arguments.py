@@ -67,7 +67,8 @@ def get_args():
             "dense_blocks",
             "compression",
             "growth_rate",
-            "model_depth"
+            "model_depth",
+            "bottleneck"
         ]
 
     for k, v in json_args.items():
@@ -87,8 +88,10 @@ def get_args():
     if "skip_n_folds" not in args:
         args["skip_n_folds"] = 0
 
-    if "augmentation" in args:
-        args["augmentation"] = args["augmentation"] == 1
+    # booleans
+    for k in ["augmentation", "bottleneck"]:
+        if k in args:
+            args[k] = args[k] == 1
 
     if "sample_weights" in args:
         if len(args["sample_weights"]) != args["noc"]:
