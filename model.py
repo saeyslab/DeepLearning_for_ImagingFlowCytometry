@@ -5,6 +5,7 @@ import models.simple
 import models.deepflow
 import models.resnet
 import models.densenet
+import models.testmodel
 
 def model_map(key):
     return {
@@ -15,7 +16,8 @@ def model_map(key):
         "deepflow_narrow": models.deepflow.deepflow_narrow,
         "resnet50": resnet50,
         "resnet18": resnet18,
-        "densenet": densenet
+        "densenet": densenet,
+        "testmodel": testmodel
     }[key]
 
 
@@ -88,3 +90,9 @@ def densenet(args):
         dropout_rate=args["dropout"] 
     )
     return builder.build_model()
+
+def testmodel(args):
+    m = models.testmodel.TestModel(args)
+    # m.build((128, 3, 90, 90))
+
+    return m

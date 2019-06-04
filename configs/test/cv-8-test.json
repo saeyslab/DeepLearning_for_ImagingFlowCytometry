@@ -9,7 +9,7 @@
 "meta": "test/test_1/meta.csv",
 "split_dir": "test_meta/s1_5fold",
 "epochs": 1,
-"model": "densenet",
+"model": "testmodel",
 "augmentation": 1,
 "comet_project": "cv-pbc-densenet",
 "es_patience": 20,
@@ -17,7 +17,7 @@
 "h5_data": "test/test_1/input.h5",
 "optimizer": "adam_def",
 "dense_blocks": 2,
-"dense_layers": 1,
+"dense_layers": 2,
 "compression": 0.5,
 "dropout":0.2
 }

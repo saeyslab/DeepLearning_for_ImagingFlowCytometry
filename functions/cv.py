@@ -10,11 +10,7 @@ def run(args, meta, model, callbacks, experiment, skip_n_folds=0):
     
     data = preprocessing.load_hdf5_to_memory(args, meta["label"].values)
     
-    model.save_weights(str(Path(args["run_dir"], 'initial_model_weights.h5')))
-
     def do(i, orig, d):
-        model.load_weights(str(Path(args["run_dir"], 'initial_model_weights.h5')))
-
         args_copy = orig.copy()
         args_copy["split_dir"] = str(d)
 

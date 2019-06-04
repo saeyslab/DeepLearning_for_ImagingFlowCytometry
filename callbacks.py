@@ -77,9 +77,9 @@ class ValidationMonitor(keras.callbacks.Callback):
             self.wait = 0
 
             if self.fold is not None:
-                self.model.save(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold))
+                self.model.save_weights(str(Path(self.args["run_dir"], "best-model-fold-%d.h5" % self.fold)))
             else:
-                self.model.save(Path(self.args["run_dir"], "best-model.h5"))
+                self.model.save_weights(str(Path(self.args["run_dir"], "best-model.h5")))
 
         self.log.write("Bal acc: %.4f\n" % bal_acc)
         self.log.write(tabulate(cm))
