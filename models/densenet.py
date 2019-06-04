@@ -97,11 +97,13 @@ class TransitionBlock(tf.keras.Model):
                                        data_format=data_format,
                                        kernel_initializer="he_normal",
                                        kernel_regularizer=l2(weight_decay))
+    self.dropout = tf.keras.layers.Dropout(rate=dropout_rate)
     self.avg_pool = tf.keras.layers.AveragePooling2D(data_format=data_format)
 
   def call(self, x, training=True):
     output = self.batchnorm(x, training=training)
     output = self.conv(tf.nn.relu(output))
+    output = self.dropout(output)
     output = self.avg_pool(output)
     return output
 
