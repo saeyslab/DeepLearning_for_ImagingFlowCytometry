@@ -16,10 +16,9 @@
 "es_epsilon": 0.0001,
 "h5_data": "test/test_1/input.h5",
 "optimizer": "adam_def",
-"dense_blocks": 2,
-"dense_layers": 1,
 "compression": 0.5,
 "dropout":0.2,
 "l2": 0.0005,
-"growth_rate": 12
+"growth_rate": 12,
+"model_depth": 40
 }

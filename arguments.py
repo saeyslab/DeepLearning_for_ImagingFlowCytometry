@@ -66,7 +66,8 @@ def get_args():
             "dense_layers",
             "dense_blocks",
             "compression",
-            "growth_rate"
+            "growth_rate",
+            "model_depth"
         ]
 
     for k, v in json_args.items():

@@ -83,8 +83,8 @@ def densenet(args):
     s = [len(args["channels"]), args["image_width"], args["image_height"]]
     return models.densenet.DenseNet(
         input_shape=tuple(s),
-        num_of_blocks=args["dense_blocks"],
-        num_layers_in_each_block=args["dense_layers"],
+        num_of_blocks=3 if "dense_blocks" not in args else args["dense_blocks"],
+        num_layers_in_each_block=-1 if "dense_layers" not in args else args["dense_layers"],
         output_classes=args["noc"],
         compression=args["compression"],
         dropout_rate=args["dropout"],
@@ -93,7 +93,7 @@ def densenet(args):
         pool_initial=False,
         include_top=True,
         bottleneck=False,
-        depth_of_model=None,
+        depth_of_model=None if "model_depth" not in args else args["model_depth"],
         data_format=tf.keras.backend.image_data_format()
     )
 
