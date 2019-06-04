@@ -271,21 +271,21 @@ class DenseNet(tf.keras.Model):
                             self.weight_decay,
                             self.dropout_rate))
 
-  def call(self, x):
+  def call(self, x, training=True):
     output = self.conv1(x)
 
     if self.pool_initial:
-      output = self.batchnorm1(output, training=self.training)
+      output = self.batchnorm1(output, training=training)
       output = tf.nn.relu(output)
       output = self.pool1(output)
 
     for i in range(self.num_of_blocks - 1):
-      output = self.dense_blocks[i](output, training=self.training)
-      output = self.transition_blocks[i](output, training=self.training)
+      output = self.dense_blocks[i](output, training=training)
+      output = self.transition_blocks[i](output, training=training)
 
     output = self.dense_blocks[
-        self.num_of_blocks - 1](output, training=self.training)
-    output = self.batchnorm2(output, training=self.training)
+        self.num_of_blocks - 1](output, training=training)
+    output = self.batchnorm2(output, training=training)
     output = tf.nn.relu(output)
 
     if self.include_top:
