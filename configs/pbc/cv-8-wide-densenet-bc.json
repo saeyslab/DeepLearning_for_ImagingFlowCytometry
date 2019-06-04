@@ -19,7 +19,7 @@
 "compression": 0.5,
 "dropout":0.2,
 "l2": 0.0001,
-"growth_rate": 48,
-"model_depth": 40,
+"growth_rate": 24,
+"model_depth": 16,
 "bottleneck": 1
 }
