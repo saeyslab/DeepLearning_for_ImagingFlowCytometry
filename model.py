@@ -83,11 +83,15 @@ def densenet(args):
     s = (len(args["channels"]), args["image_width"], args["image_height"])
     builder = models.densenet.DenseNet(
         input_shape=s, 
-        dense_blocks=args["dense_blocks"],
-        dense_layers=args["dense_layers"],
         nb_classes=args["noc"],
         compression=args["compression"],
-        dropout_rate=args["dropout"] 
+        dropout_rate=args["dropout"], 
+        dense_blocks=3 if "dense_blocks" not in args else args["dense_blocks"],
+        dense_layers=-1 if "dense_layers" not in args else args["dense_layers"],
+        growth_rate=args["growth_rate"],
+        weight_decay=args["l2"],
+        bottleneck=False,
+        depth=None if "model_depth" not in args else args["model_depth"],
     )
     return builder.build_model()
 
