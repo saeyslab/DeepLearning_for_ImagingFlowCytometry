@@ -101,7 +101,7 @@ class DenseNet:
 
         # Add last dense block without transition but for that with global average pooling
         x, nb_channels = self.dense_block(x, self.dense_layers[-1], nb_channels,
-                                          self.growth_rate, self.dropout_rate, self.weight_decay)
+                                          self.growth_rate, self.dropout_rate, self.bottleneck, self.weight_decay)
         x = layers.BatchNormalization()(x)
         x = layers.Activation('relu')(x)
         x = layers.GlobalAveragePooling2D()(x)
@@ -129,6 +129,7 @@ class DenseNet:
 
         # Bottleneck
         if bottleneck:
+            print("Bottleneck")
             bottleneckWidth = 4
             x = layers.BatchNormalization()(x)
             x = layers.Activation('relu')(x)
