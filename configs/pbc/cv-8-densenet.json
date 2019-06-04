@@ -19,5 +19,7 @@
 "dense_blocks": 4,
 "dense_layers": 3,
 "compression": 0.5,
-"dropout":0.2
+"dropout":0.2,
+"l2": 0.0001,
+"growth_rate": 12
 }
