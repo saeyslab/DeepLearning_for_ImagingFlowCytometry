@@ -90,8 +90,8 @@ def densenet(args):
         dense_layers=-1 if "dense_layers" not in args else args["dense_layers"],
         growth_rate=args["growth_rate"],
         weight_decay=args["l2"],
-        bottleneck=False,
         depth=None if "model_depth" not in args else args["model_depth"],
+        bottleneck=args["bottleneck"],
     )
     return builder.build_model()
 
