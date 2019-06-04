@@ -5,6 +5,7 @@ import models.simple
 import models.deepflow
 import models.resnet
 import models.densenet
+import models.testmodel
 
 def model_map(key):
     return {
@@ -15,7 +16,8 @@ def model_map(key):
         "deepflow_narrow": models.deepflow.deepflow_narrow,
         "resnet50": resnet50,
         "resnet18": resnet18,
-        "densenet": densenet
+        "densenet": densenet,
+        "testmodel": testmodel
     }[key]
 
 
@@ -79,7 +81,7 @@ def resnet18(args):
 
 def densenet(args):
     s = [len(args["channels"]), args["image_width"], args["image_height"]]
-    m = models.densenet.DenseNet(
+    return models.densenet.DenseNet(
         input_shape=tuple(s),
         num_of_blocks=args["dense_blocks"],
         num_layers_in_each_block=args["dense_layers"],
@@ -94,9 +96,8 @@ def densenet(args):
         depth_of_model=None,
         data_format=tf.keras.backend.image_data_format()
     )
-    
-    # m.build(tuple([128] + s))
+
+def testmodel(args):
+    m = models.testmodel.TestModel(args)
 
     return m
-
-

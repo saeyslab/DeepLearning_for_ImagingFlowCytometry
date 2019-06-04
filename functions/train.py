@@ -24,6 +24,14 @@ def prerun(args, meta, data):
 def run(args, meta, model, callbacks, exp, id_=100, data=None):
     train_ds, val_ds, train_len, validation_len = prerun(args, meta, data)
     
+    init_weights_path = Path(args["run_dir"], 'initial_model_weights.h5')
+    if init_weights_path.exists():
+        model.load_weights(str(init_weights_path))
+    
+    if not init_weights_path.exists():
+        hist = model.fit(train_ds,epochs=1,steps_per_epoch=1)
+        model.save_weights(str(init_weights_path))
+    
     for cb in callbacks:
         if type(cb)==my_callbacks.ValidationMonitor:
             cb.set(val_ds, validation_len, id_, exp)
@@ -34,5 +42,5 @@ def run(args, meta, model, callbacks, exp, id_=100, data=None):
         steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
         callbacks=callbacks
     )
-
+    
     return hist
