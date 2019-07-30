@@ -48,7 +48,7 @@ def make_callbacks_and_model(args, tb=True):
     run = args["run_dir"]
 
     cb = [
-        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq=1),
+        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq='epoch'),
         my_callbacks.ValidationMonitor(Path(run, "scores.log"), args)
     ]
 
