@@ -69,6 +69,7 @@ def main():
     
     tf.config.gpu.set_per_process_memory_fraction(args["gpu_mem_fraction"])
     tf.config.gpu.set_per_process_memory_growth(True)
+    tf.keras.backend.set_image_data_format("channels_first")
 
     meta = pd.read_csv(args["meta"])
         
