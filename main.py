@@ -15,7 +15,6 @@ import socket
 
 import tensorflow as tf
 from tensorflow.keras import callbacks as tf_callbacks
-from tensorflow.keras.backend import set_session
 import callbacks as my_callbacks
 
 def prerun(args, run_dir=True, exp=True):
@@ -49,7 +48,7 @@ def make_callbacks_and_model(args, tb=True):
     run = args["run_dir"]
 
     cb = [
-        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, period=1),
+        tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq=1),
         my_callbacks.ValidationMonitor(Path(run, "scores.log"), args)
     ]
 
@@ -66,9 +65,17 @@ def make_callbacks_and_model(args, tb=True):
 def main():
   
     args = arguments.get_args()
-    
-    tf.config.gpu.set_per_process_memory_fraction(args["gpu_mem_fraction"])
-    tf.config.gpu.set_per_process_memory_growth(True)
+
+    gpus = tf.config.experimental.list_logical_devices('GPU')
+    if gpus:
+        try:
+            tf.config.experimental.set_virtual_device_configuration(
+                gpus[0],
+                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=5000)])
+        except RuntimeError as e:
+            # Virtual devices must be set before GPUs have been initialized
+            print(e)
+
     tf.keras.backend.set_image_data_format("channels_first")
 
     meta = pd.read_csv(args["meta"])
