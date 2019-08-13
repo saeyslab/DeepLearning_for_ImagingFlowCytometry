@@ -66,15 +66,17 @@ def main():
   
     args = arguments.get_args()
 
-    gpus = tf.config.experimental.list_logical_devices('GPU')
+    gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpus:
+        # Restrict TensorFlow to only use the first GPU
         try:
-            tf.config.experimental.set_virtual_device_configuration(
-                gpus[0],
-                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=5000)])
+            for gpu in gpus:
+                print(gpu)
+                tf.config.experimental.set_memory_growth(gpu, True)
         except RuntimeError as e:
-            # Virtual devices must be set before GPUs have been initialized
+            # Visible devices must be set before GPUs have been initialized
             print(e)
+
 
     tf.keras.backend.set_image_data_format("channels_first")
 
