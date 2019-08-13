@@ -7,7 +7,7 @@
 "noc": 8,
 "channels": [1, 6, 9],
 "meta": "9-color/d34_ideas.csv",
-"split_dir": "9-color_meta/d23_5fold_shuffled",
+"split_dir": "9-color_meta/d34_5fold",
 "epochs": 50,
 "model": "densenet",
 "augmentation": 1,
