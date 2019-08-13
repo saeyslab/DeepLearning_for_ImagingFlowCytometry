@@ -88,7 +88,7 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
     return ds, ds_length
 
 def load_hdf5_to_memory(args, labels):
-    with h5py.File(args["h5_data"]) as h5fp:    
+    with h5py.File(args["h5_data"], mode="r", libver="latest", swmr=True) as h5fp:    
         return dataset_wrapper(h5fp, labels, args["channels"])
 
 
