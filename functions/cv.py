@@ -4,7 +4,7 @@ import tensorflow as tf
 from pathlib import Path
 import preprocessing
 from tensorflow.keras import callbacks as tf_callbacks
-import model
+import model as modelmod
 
 def run(args, meta, model, callbacks, experiment, skip_n_folds=0):
     experiment.log_parameters(args)
@@ -15,7 +15,7 @@ def run(args, meta, model, callbacks, experiment, skip_n_folds=0):
         args_copy = orig.copy()
         args_copy["split_dir"] = str(d)
 
-        model = model.build_model(args, m=model)
+        model = modelmod.build_model(args, m=model)
 
         functions.train.run(args_copy, meta, model, callbacks, data=data, id_=i, exp=experiment)
 
