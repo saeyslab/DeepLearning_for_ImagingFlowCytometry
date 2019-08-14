@@ -58,7 +58,8 @@ def build_model(args):
     m = model_map(args["model"])(args)
     optimizer = optimizer_map(args["optimizer"])(args)
 
-    bal_acc = metrics.BalancedAccuracy(args["noc"]).balanced_accuracy
+    bal_acc = metrics.BalancedAccuracy(args["noc"])
+
     m.compile(
         optimizer=optimizer,
         loss=tf.keras.losses.sparse_categorical_crossentropy,

@@ -49,7 +49,17 @@ def make_callbacks_and_model(args, tb=True):
 
     cb = [
         tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq='epoch'),
-        my_callbacks.ValidationMonitor(Path(run, "scores.log"), args)
+        tf_callbacks.EarlyStopping(
+            monitor="val_balanced_accuracy", 
+            patience=args["es_patience"],
+            mode="max",
+            min_delta=args["es_epsilon"]
+        ),
+        tf_callbacks.ReduceLROnPlateau(
+            monitor="val_balanced_accuracy", 
+            factor=0.5, patience=int(args["es_patience"]/2)
+        ),
+        tf_callbacks.CSVLogger(str(Path(run, 'scores.log')))
     ]
 
     m = model.build_model(args)

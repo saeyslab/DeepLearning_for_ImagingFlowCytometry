@@ -40,7 +40,9 @@ def run(args, meta, model, callbacks, exp, id_=100, data=None):
         train_ds,
         epochs=args["epochs"], 
         steps_per_epoch=int(np.ceil(train_len/args["batch_size"])),
-        callbacks=callbacks
+        callbacks=callbacks,
+        validation_data=val_ds,
+        validation_steps=int(np.ceil(validation_len/args["batch_size"]))
     )
     
     return hist
