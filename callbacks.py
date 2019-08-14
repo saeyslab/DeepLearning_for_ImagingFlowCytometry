@@ -8,6 +8,17 @@ from tabulate import tabulate
 from tqdm import tqdm
 import pickle
 
+
+class CometLogger(keras.callbacks.Callback):
+
+    def __init__(self, experiment):
+        self.experiment = experiment
+
+    def on_epoch_end(self, epoch, logs=None):
+        if logs:
+            self.experiment.log_metrics(logs, step=epoch)
+
+
 class ValidationMonitor(keras.callbacks.Callback):
 
     def __init__(self, logfile, args):

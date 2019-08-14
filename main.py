@@ -103,6 +103,8 @@ def main():
     def train():
         experiment = prerun(args)
         callbacks, model = make_callbacks_and_model(args)
+        callbacks.append(my_callbacks.CometLogger(experiment))
+
         functions.train.run(args, meta, model, callbacks, experiment)
 
     def cv():
@@ -110,6 +112,8 @@ def main():
         experiment = prerun(args, run_dir=new_run_dir)
 
         callbacks, model = make_callbacks_and_model(args, tb=False)
+        callbacks.append(my_callbacks.CometLogger(experiment))
+    
         functions.cv.run(args, meta, model, callbacks, experiment, skip_n_folds=args["skip_n_folds"])
 
     def predict():
