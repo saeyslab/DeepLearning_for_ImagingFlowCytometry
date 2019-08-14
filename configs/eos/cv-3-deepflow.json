@@ -21,6 +21,8 @@
     "epsilon": 0.1,
     "optimizer": "adam",
     "h5_data": "eos/s12.h5",
-    "gpu_mem_fraction": 0.45
+    "gpu_mem_fraction": 0.45,
+    "lrplat_patience": 5,
+    "lrplat_epsilon": 0.01
 }
 

@@ -20,6 +20,8 @@
     "beta1": 0.9,
     "epsilon": 0.1,
     "optimizer": "adam",
-    "h5_data": "9-color/earlyfix_d34.h5"
+    "h5_data": "9-color/earlyfix_d34.h5",
+    "lrplat_patience": 5,
+    "lrplat_epsilon": 0.01
 }
 

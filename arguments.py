@@ -56,6 +56,8 @@ def get_args():
             "h5_data",
             "es_patience",
             "es_epsilon",
+            "lrplat_patience",
+            "lrplat_epsilon",
             "beta1",
             "epsilon",
             "skip_n_folds",

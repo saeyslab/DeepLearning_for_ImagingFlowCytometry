@@ -56,8 +56,8 @@ def make_callbacks_and_model(args, tb=True):
             min_delta=args["es_epsilon"]
         ),
         tf_callbacks.ReduceLROnPlateau(
-            monitor="val_balanced_accuracy", 
-            factor=0.5, patience=int(args["es_patience"]/2)
+            monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
+            factor=0.5, patience=int(args["lrplat_patience"])
         ),
         tf_callbacks.CSVLogger(str(Path(run, 'scores.log')))
     ]
