@@ -2,19 +2,27 @@ from tensorflow import keras
 
 def deepflow(args):
 
+    initializer = "he_uniform"
+
     def _dual_factory(inp, f_out_1, f_out_2):
-        conv1 = keras.layers.Conv2D(f_out_1, 1, padding="valid", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv1 = keras.layers.Conv2D(
+            f_out_1, 1, padding="valid", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+            kernel_initializer=initializer, bias_initializer=initializer)(inp)
         conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
         conv1 = keras.layers.ReLU()(conv1)
 
-        conv2 = keras.layers.Conv2D(f_out_2, 3, padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv2 = keras.layers.Conv2D(
+            f_out_2, 3, padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+            kernel_initializer=initializer, bias_initializer=initializer)(inp)
         conv2 = keras.layers.BatchNormalization(axis=1, scale=False)(conv2)
         conv2 = keras.layers.ReLU()(conv2)
 
         return keras.layers.Concatenate(axis=1)([conv1, conv2])
 
     def _dual_downsample_factory(inp, f_out):
-        conv1 = keras.layers.Conv2D(f_out, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+        conv1 = keras.layers.Conv2D(
+            f_out, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+            kernel_initializer=initializer, bias_initializer=initializer)(inp)
         conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
         conv1 = keras.layers.ReLU()(conv1)
         
@@ -24,7 +32,9 @@ def deepflow(args):
 
     inp = keras.layers.Input(shape=(len(args["channels"]), args["image_width"], args["image_height"]))
 
-    conv1 = keras.layers.Conv2D(96, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(inp)
+    conv1 = keras.layers.Conv2D(
+        96, 3, strides=[2, 2], padding="same", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+        kernel_initializer=initializer, bias_initializer=initializer)(inp)
     conv1 = keras.layers.BatchNormalization(axis=1, scale=False)(conv1)
     conv1 = keras.layers.ReLU()(conv1)
 
@@ -46,8 +56,12 @@ def deepflow(args):
     in6c = _dual_factory(in6b, 176, 160)
 
     flatten = keras.layers.Flatten(data_format="channels_first")(in6c)
-    fc1 = keras.layers.Dense(256, activation="relu", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(flatten)
-    soft = keras.layers.Dense(args["noc"], activation="softmax", kernel_regularizer=keras.regularizers.l2(l=args["l2"]))(fc1)
+    fc1 = keras.layers.Dense(
+        256, activation="relu", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+        kernel_initializer=initializer, bias_initializer=initializer)(flatten)
+    soft = keras.layers.Dense(
+        args["noc"], activation="softmax", kernel_regularizer=keras.regularizers.l2(l=args["l2"]),
+        kernel_initializer=initializer, bias_initializer=initializer)(fc1)
 
     model = keras.models.Model(inputs=inp, outputs=soft)
 

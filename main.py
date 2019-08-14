@@ -77,6 +77,10 @@ def main():
             # Visible devices must be set before GPUs have been initialized
             print(e)
 
+    from numpy.random import seed
+    seed(1)
+    from tensorflow.random import set_seed
+    set_seed(2)
 
     tf.keras.backend.set_image_data_format("channels_first")
 
