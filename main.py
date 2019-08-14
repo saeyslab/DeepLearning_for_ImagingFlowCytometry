@@ -65,7 +65,8 @@ def make_callbacks_and_model(args, tb=True):
     m = model.build_model(args)
     
     if tb:
-        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=1, profile_batch=3, write_graph=True)
+        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=1, profile_batch=0, write_graph=True)
+    
         tb.set_model(m)
         cb.append(tb)
 
