@@ -15,9 +15,9 @@ def run(args, meta, model, callbacks, experiment, skip_n_folds=0):
         args_copy = orig.copy()
         args_copy["split_dir"] = str(d)
 
-        model = modelmod.build_model(args, m=model)
+        m = modelmod.build_model(args, m=model)
 
-        functions.train.run(args_copy, meta, model, callbacks, data=data, id_=i, exp=experiment)
+        functions.train.run(args_copy, meta, m, callbacks, data=data, id_=i, exp=experiment)
 
     for i, d in enumerate(Path(args["split_dir"]).iterdir()):
         if i < skip_n_folds:
