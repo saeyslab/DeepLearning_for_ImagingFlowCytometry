@@ -54,8 +54,9 @@ def optimizer_map(key):
     }[key]
 
 
-def build_model(args):
-    m = model_map(args["model"])(args)
+def build_model(args, m=None):
+    if m is None:
+        m = model_map(args["model"])(args)
     optimizer = optimizer_map(args["optimizer"])(args)
 
     bal_acc = metrics.BalancedAccuracy(args["noc"])
