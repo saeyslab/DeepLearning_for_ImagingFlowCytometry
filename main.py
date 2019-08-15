@@ -58,7 +58,6 @@ def make_callbacks(args, experiment=None, run=None):
             save_best_only=True,
             mode="max",
             monitor="val_balanced_accuracy",
-            save_freq="epoch"
         ),
         tf_callbacks.EarlyStopping(
             monitor="val_balanced_accuracy", 
