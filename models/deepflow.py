@@ -3,7 +3,7 @@ import tensorflow as tf
 
 def deepflow(args):
 
-    initializer = "he_uniform"
+    initializer = "he_normal"
 
     def _dual_factory(inp, f_out_1, f_out_2):
         with tf.name_scope("Dual") as scope:

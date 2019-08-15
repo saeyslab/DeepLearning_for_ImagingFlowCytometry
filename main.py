@@ -44,11 +44,22 @@ def prerun(args, run_dir=True, exp=True):
     else:
         return None
 
-def make_callbacks_and_model(args, tb=True):
-    run = args["run_dir"]
+
+def make_callbacks(args, experiment=None, run=None):
+    if run is None:
+        run = args["run_dir"]
 
     cb = [
         tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq='epoch'),
+        tf_callbacks.ModelCheckpoint(
+            str(Path(run, "best-model.hdf5")), 
+            verbose=0, 
+            save_freq='epoch',
+            save_best_only=True,
+            mode="max",
+            monitor="val_balanced_accuracy",
+            save_freq="epoch"
+        ),
         tf_callbacks.EarlyStopping(
             monitor="val_balanced_accuracy", 
             patience=args["es_patience"],
@@ -62,15 +73,10 @@ def make_callbacks_and_model(args, tb=True):
         tf_callbacks.CSVLogger(str(Path(run, 'scores.log')))
     ]
 
-    m = model.build_model(args)
-    
-    if tb:
-        tb = tf_callbacks.TensorBoard(log_dir=run, histogram_freq=1, profile_batch=0, write_graph=True)
-    
-        tb.set_model(m)
-        cb.append(tb)
+    if experiment:
+        cb.append(my_callbacks.CometLogger(experiment))
 
-    return cb, m
+    return cb
 
 
 def main():
@@ -103,19 +109,17 @@ def main():
 
     def train():
         experiment = prerun(args)
-        callbacks, model = make_callbacks_and_model(args)
-        callbacks.append(my_callbacks.CometLogger(experiment))
+        m = model.build_model(args)
+        callbacks = make_callbacks(args, experiment)
 
-        functions.train.run(args, meta, model, callbacks, experiment)
+        functions.train.run(args, meta, m, callbacks, experiment)
 
     def cv():
         new_run_dir = args["skip_n_folds"] == 0
         experiment = prerun(args, run_dir=new_run_dir)
+        m = model.build_model(args)
 
-        callbacks, model = make_callbacks_and_model(args, tb=False)
-        callbacks.append(my_callbacks.CometLogger(experiment))
-    
-        functions.cv.run(args, meta, model, callbacks, experiment, skip_n_folds=args["skip_n_folds"])
+        functions.cv.run(args, meta, m, experiment, skip_n_folds=args["skip_n_folds"])
 
     def predict():
         functions.predict.run(args, meta)
