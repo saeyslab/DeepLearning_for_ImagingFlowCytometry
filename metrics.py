@@ -22,9 +22,10 @@ class BalancedAccuracy(tf.keras.metrics.Metric):
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         confusion_matrix = tf.math.confusion_matrix(y_true, tf.argmax(y_pred, axis=1), num_classes=self.noc)
-        self.confusion_matrix.assign_add(confusion_matrix)
+        return self.confusion_matrix.assign_add(confusion_matrix)
 
     def result(self):
         diag = tf.linalg.diag_part(self.confusion_matrix)
         rowsums = tf.math.reduce_sum(self.confusion_matrix, axis=1)
-        return tf.math.reduce_mean(diag/rowsums, axis=0)
+        result = tf.math.reduce_mean(diag/rowsums, axis=0)
+        return result

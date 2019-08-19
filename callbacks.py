@@ -1,4 +1,5 @@
 import tensorflow
+import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import metrics
@@ -7,6 +8,8 @@ from pathlib import Path
 from tabulate import tabulate
 from tqdm import tqdm
 import pickle
+from tensorflow.python.ops import summary_ops_v2
+from tensorflow.python.eager import context
 
 
 class CometLogger(keras.callbacks.Callback):
@@ -17,6 +20,28 @@ class CometLogger(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         if logs:
             self.experiment.log_metrics(logs, step=epoch)
+
+
+class ImageLogger(keras.callbacks.Callback):
+
+    def __init__(self, writer):
+        self.writer = writer
+    
+    def make_summary(self, tensor):
+        with context.eager_mode(), self.writer.as_default(), summary_ops_v2.always_record_summaries():
+            for i in range(self.n_channels):
+                summary_ops_v2.image(
+                    "image dim %d" % i, 
+                    tensor[:, i, :, :, tf.newaxis],
+                    max_images=3,
+                )
+
+    def set_dataset(self, dataset, n_channels):
+        self.dataset = dataset
+        self.n_channels = n_channels
+
+    def on_train_begin(self, logs=None):
+        self.make_summary(next(iter(self.dataset))[0])
 
 
 class ValidationMonitor(keras.callbacks.Callback):

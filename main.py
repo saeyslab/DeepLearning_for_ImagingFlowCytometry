@@ -16,6 +16,7 @@ import socket
 import tensorflow as tf
 from tensorflow.keras import callbacks as tf_callbacks
 import callbacks as my_callbacks
+from tensorflow.python.ops import summary_ops_v2
 
 def prerun(args, run_dir=True, exp=True):
     if run_dir:
@@ -46,8 +47,11 @@ def prerun(args, run_dir=True, exp=True):
 
 
 def make_callbacks(args, experiment=None, run=None):
+
     if run is None:
         run = args["run_dir"]
+
+    writer = summary_ops_v2.create_file_writer_v2(run) 
 
     cb = [
         tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq='epoch'),
@@ -65,11 +69,12 @@ def make_callbacks(args, experiment=None, run=None):
             mode="max",
             min_delta=args["es_epsilon"]
         ),
-        tf_callbacks.ReduceLROnPlateau(
-            monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
-            factor=0.5, patience=int(args["lrplat_patience"])
-        ),
-        tf_callbacks.CSVLogger(str(Path(run, 'scores.log')))
+        # tf_callbacks.ReduceLROnPlateau(
+        #     monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
+        #     factor=0.5, patience=int(args["lrplat_patience"])
+        # ),
+        tf_callbacks.CSVLogger(str(Path(run, 'scores.log'))),
+        my_callbacks.ImageLogger(writer)
     ]
 
     if experiment:
