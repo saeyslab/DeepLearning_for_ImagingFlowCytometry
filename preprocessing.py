@@ -128,7 +128,7 @@ def apply_augmentation(image):
 
     dx = tf.random.uniform([], -6, 6, tf.float32)
     dy = tf.random.uniform([], -6, 6, tf.float32)
-    distorted_image = tfa.image.transform_ops.transform(distorted_image, [dx, 0, 0, 0, dy, 0, 0, 0])
+    distorted_image = tfa.image.transform_ops.transform(distorted_image, [1, 0, dx, 0, 1, dy, 0, 0])
 
     distorted_image = tf.transpose(distorted_image, [2, 0, 1])
     return distorted_image

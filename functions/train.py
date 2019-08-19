@@ -36,7 +36,7 @@ def run(args, meta, model, callbacks, exp, id_=100, data=None):
         if type(cb)==my_callbacks.ValidationMonitor:
             cb.set(val_ds, validation_len, id_, exp)
         if type(cb)==my_callbacks.ImageLogger:
-            cb.set_dataset(val_ds, len(args["channels"]))
+            cb.set_dataset(train_ds, len(args["channels"]))
 
     hist = model.fit(
         train_ds,
