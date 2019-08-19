@@ -15,6 +15,8 @@ from tensorflow.python.eager import context
 class CometLogger(keras.callbacks.Callback):
 
     def __init__(self, experiment):
+        super(CometLogger, self).__init__()
+
         self.experiment = experiment
 
     def on_epoch_end(self, epoch, logs=None):
@@ -25,6 +27,8 @@ class CometLogger(keras.callbacks.Callback):
 class ImageLogger(keras.callbacks.Callback):
 
     def __init__(self, writer):
+        super(ImageLogger, self).__init__()
+
         self.writer = writer
     
     def make_summary(self, tensor):

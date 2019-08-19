@@ -51,7 +51,13 @@ def make_callbacks(args, experiment=None, run=None):
     if run is None:
         run = args["run_dir"]
 
-    writer = summary_ops_v2.create_file_writer_v2(run) 
+    writer = summary_ops_v2.create_file_writer_v2(run)
+
+    def schedule(epoch):
+        if epoch < args["warmup_length"]:
+            return args["warmup_coeff"]*args["learning_rate"]
+        else:
+            return args["learning_rate"]
 
     cb = [
         tf_callbacks.ModelCheckpoint(str(Path(run, "model.hdf5")), verbose=0, save_freq='epoch'),
@@ -73,8 +79,10 @@ def make_callbacks(args, experiment=None, run=None):
         #     monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
         #     factor=0.5, patience=int(args["lrplat_patience"])
         # ),
+        tf_callbacks.LearningRateScheduler(schedule),
         tf_callbacks.CSVLogger(str(Path(run, 'scores.log'))),
-        my_callbacks.ImageLogger(writer)
+        my_callbacks.ImageLogger(writer),
+        tf_callbacks.TensorBoard(log_dir=run, write_graph=True, profile_batch=0, histogram_freq=1)
     ]
 
     if experiment:

@@ -70,7 +70,9 @@ def get_args():
             "compression",
             "growth_rate",
             "model_depth",
-            "bottleneck"
+            "bottleneck",
+            "warmup_length",
+            "warmup_coeff"
         ]
 
     for k, v in json_args.items():

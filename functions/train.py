@@ -32,7 +32,7 @@ def run(args, meta, model, callbacks, exp, id_=100, data=None):
         hist = model.fit(train_ds,epochs=1,steps_per_epoch=1)
         model.save_weights(str(init_weights_path))
     
-    for cb in callbacks:
+    for i, cb in enumerate(callbacks):
         if type(cb)==my_callbacks.ValidationMonitor:
             cb.set(val_ds, validation_len, id_, exp)
         if type(cb)==my_callbacks.ImageLogger:

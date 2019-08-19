@@ -16,7 +16,15 @@ class dataset_wrapper:
             ims = h5fp[chan]["images"]
             masks = h5fp[chan]["masks"]
 
-            self.images[i] = np.multiply(ims, masks, dtype=np.float32)/2**16
+            self.images[i] = np.multiply(ims, masks, dtype=np.float32)
+
+            # per image normalization
+            min_ = self.images[i].reshape(self.images[i].shape[0], -1).min(axis=1)
+            max_ = self.images[i].reshape(self.images[i].shape[0], -1).max(axis=1)
+
+            max_ = np.where(max_== 0.0, np.ones_like(max_), max_)
+
+            self.images[i] = ((self.images[i].T-min_)/(min_+max_)).T
 
 
 class generator:
