@@ -16,9 +16,11 @@
     "es_epsilon": 0.0001,
     "h5_data": "9-color/earlyfix_d34.h5",
     "optimizer": "adam",
-    "learning_rate": 1e-5,
+    "learning_rate": 1e-3,
     "epsilon": 0.1,
     "beta1":0.9,
     "lrplat_patience": 5,
-    "lrplat_epsilon": 0.01
+    "lrplat_epsilon": 0.01,
+    "warmup_length": 6,
+    "warmup_coeff": 0.01
 }
