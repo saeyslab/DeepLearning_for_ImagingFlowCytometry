@@ -18,7 +18,7 @@ def run(args, meta, model, experiment, skip_n_folds=0):
         log_dir = Path(args["run_dir"], str(i))
         log_dir.mkdir()
 
-        callbacks = main.make_callbacks(args, experiment=experiment, run=log_dir)
+        callbacks = main.make_callbacks(args, experiment=experiment, run=str(log_dir))
         m = modelmod.build_model(args, m=model)
 
         functions.train.run(args_copy, meta, m, callbacks, data=data, id_=i, exp=experiment)
