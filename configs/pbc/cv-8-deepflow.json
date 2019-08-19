@@ -16,14 +16,14 @@
     "es_patience": 20,
     "es_epsilon": 0.0001,
     "sample_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
-    "learning_rate": 1e-2, 
+    "learning_rate": 1e-3, 
     "beta1": 0.9,
     "epsilon": 0.1,
     "optimizer": "adam",
     "h5_data": "9-color/earlyfix_d34.h5",
     "lrplat_patience": 5,
     "lrplat_epsilon": 0.01,
-    "warmup_length": 10,
-    "warmup_coeff": 0.001
+    "warmup_length": 6,
+    "warmup_coeff": 0.01
 }
 

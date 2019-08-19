@@ -1,6 +1,7 @@
 import tensorflow
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import backend as K
 import numpy as np
 import metrics
 import sklearn
@@ -10,6 +11,54 @@ from tqdm import tqdm
 import pickle
 from tensorflow.python.ops import summary_ops_v2
 from tensorflow.python.eager import context
+
+
+class ReduceLROnPlateaWithWarmup(keras.callbacks.ReduceLROnPlateau):
+    def __init__(self, monitor, min_delta, factor, patience, base_learning_rate, warmup_length, warmup_coeff):
+        super(ReduceLROnPlateaWithWarmup, self).__init__(
+            monitor=monitor, 
+            min_delta=min_delta,
+            factor=factor,
+            patience=patience
+        )
+
+        self.warmup_length = warmup_length
+        self.warmup_coeff = warmup_coeff
+        self.base_learning_rate = base_learning_rate
+
+    def on_epoch_end(self, epoch, logs=None):
+        if epoch < warmup_length:
+            logs = logs or {}
+            logs['lr'] = self.warmup_coeff*self.base_learning_rate
+            keras.backend.set_value(self.model.optimizer.lr, self.warmup_coeff*self.base_learning_rate)
+        else:
+            super().on_epoch_end(epoch, logs)
+
+
+class AdamLRLogger(keras.callbacks.Callback):
+
+    def __init__(self, writer):
+        super(AdamLRLogger, self).__init__()
+        self.writer = writer
+
+    def on_epoch_end(self, epoch, logs=None):
+        opt = self.model.optimizer
+
+        lr = K.get_value(opt.lr)
+        iterations = K.get_value(opt.iterations)
+        beta_2 = K.get_value(opt.beta_2)
+        beta_1 = K.get_value(opt.beta_1)
+        
+        t = K.cast(iterations, K.floatx()) + 1
+        lr_t = lr * (K.sqrt(1. - K.pow(beta_2, t)) /
+                     (1. - K.pow(beta_1, t)))
+
+        with context.eager_mode(), self.writer.as_default(), summary_ops_v2.always_record_summaries():
+            summary_ops_v2.scalar(
+                "adam_lr",
+                lr_t,
+                step=epoch
+            )
 
 
 class CometLogger(keras.callbacks.Callback):

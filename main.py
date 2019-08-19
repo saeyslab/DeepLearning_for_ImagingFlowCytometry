@@ -82,7 +82,8 @@ def make_callbacks(args, experiment=None, run=None):
         tf_callbacks.LearningRateScheduler(schedule),
         tf_callbacks.CSVLogger(str(Path(run, 'scores.log'))),
         my_callbacks.ImageLogger(writer),
-        tf_callbacks.TensorBoard(log_dir=run, write_graph=True, profile_batch=0, histogram_freq=1)
+        tf_callbacks.TensorBoard(log_dir=run, write_graph=True, profile_batch=0, histogram_freq=1),
+        my_callbacks.AdamLRLogger(writer)
     ]
 
     if experiment:
