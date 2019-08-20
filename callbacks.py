@@ -13,9 +13,9 @@ from tensorflow.python.ops import summary_ops_v2
 from tensorflow.python.eager import context
 
 
-class ReduceLROnPlateaWithWarmup(keras.callbacks.ReduceLROnPlateau):
+class ReduceLROnPlateauWithWarmup(keras.callbacks.ReduceLROnPlateau):
     def __init__(self, monitor, min_delta, factor, patience, base_learning_rate, warmup_length, warmup_coeff):
-        super(ReduceLROnPlateaWithWarmup, self).__init__(
+        super(ReduceLROnPlateauWithWarmup, self).__init__(
             monitor=monitor, 
             min_delta=min_delta,
             factor=factor,
@@ -30,6 +30,9 @@ class ReduceLROnPlateaWithWarmup(keras.callbacks.ReduceLROnPlateau):
         if epoch < self.warmup_length:
             new_lr = self.warmup_coeff*self.base_learning_rate
             keras.backend.set_value(self.model.optimizer.lr, new_lr)
+        if epoch == self.warmup_length:
+            keras.backend.set_value(self.model.optimizer.lr, self.base_learning_rate)
+            super().on_epoch_end(epoch, logs)
         else:
             super().on_epoch_end(epoch, logs)
 
@@ -53,7 +56,8 @@ class AdamLRLogger(keras.callbacks.Callback):
                      (1. - tf.pow(beta_1, t)))
 
         with context.eager_mode(), self.writer.as_default(), summary_ops_v2.always_record_summaries():
-            summary_ops_v2.scalar("adam/lr", lr_t, step=epoch)
+            summary_ops_v2.scalar("adam/lr_t", lr_t, step=epoch)
+            summary_ops_v2.scalar("adam/lr", lr, step=epoch)
             summary_ops_v2.scalar("adam/beta1", beta_1, step=epoch)
             summary_ops_v2.scalar("adam/beta2", beta_2, step=epoch)
             summary_ops_v2.scalar("adam/iterations", iterations, step=epoch)

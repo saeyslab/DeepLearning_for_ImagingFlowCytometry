@@ -76,7 +76,7 @@ def make_callbacks(args, experiment=None, run=None):
             mode="max",
             min_delta=args["es_epsilon"]
         ),
-        tf_callbacks.ReduceLROnPlateau(
+        my_callbacks.ReduceLROnPlateauWithWarmup(
             monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
             factor=0.5, patience=int(args["lrplat_patience"]),
             base_learning_rate=args["learning_rate"],
