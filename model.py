@@ -6,6 +6,8 @@ import models.deepflow
 import models.resnet
 import models.densenet
 import models.testmodel
+import h5py
+import json
 
 def model_map(key):
     return {
@@ -53,6 +55,12 @@ def optimizer_map(key):
         "rmsprop": get_rmsprop
     }[key]
 
+
+def load_model(args):
+    m = model_map(args["model"])(args)
+    m.load_weights(args["model_hdf5"])
+
+    return m
 
 def build_model(args, m=None):
     if m is None:

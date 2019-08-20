@@ -8,8 +8,8 @@ def get_args():
 
     parser.add_argument("function", type=str)
     parser.add_argument("config", type=str)
-    parser.add_argument("run_dir", type=str)
     parser.add_argument("root", type=str)
+    parser.add_argument("--run_dir", "-r", type=str, default="")
     parser.add_argument("--overwrite", type=str, default="{}")
     parser.add_argument("--rm", action='store_true')
     

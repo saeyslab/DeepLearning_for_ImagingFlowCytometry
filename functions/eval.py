@@ -6,6 +6,7 @@ import main
 import time
 import preprocessing
 import numpy as np
+import model
 
 def run(args, meta):
     main.prerun(args, run_dir=False, exp=False)
@@ -13,10 +14,10 @@ def run(args, meta):
     with tf.device("/cpu:0"):
         labels = meta["label"].values
         data = preprocessing.load_hdf5_to_memory(args, labels)
-        val_idx = np.loadtxt(Path(args["run_dir"], 'val.txt'), dtype=int)
+        val_idx = np.loadtxt(Path(args["split_dir"], 'val.txt'), dtype=int)
         ds, ds_len = preprocessing.load_dataset(data, val_idx, labels, args, type="val")
-    
-    m = tf.keras.models.load_model(args["model_hdf5"], compile=False)
+
+    m = model.load_model(args)
     
     preds = m.evaluate(
         ds,
