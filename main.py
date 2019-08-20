@@ -76,11 +76,14 @@ def make_callbacks(args, experiment=None, run=None):
             mode="max",
             min_delta=args["es_epsilon"]
         ),
-        # tf_callbacks.ReduceLROnPlateau(
-        #     monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
-        #     factor=0.5, patience=int(args["lrplat_patience"])
-        # ),
-        tf_callbacks.LearningRateScheduler(schedule),
+        tf_callbacks.ReduceLROnPlateau(
+            monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
+            factor=0.5, patience=int(args["lrplat_patience"]),
+            base_learning_rate=args["learning_rate"],
+            warmup_length=args["warmup_length"],
+            warmup_coeff=args["warmup_coeff"]
+        ),
+        # tf_callbacks.LearningRateScheduler(schedule),
         tf_callbacks.CSVLogger(str(Path(run, 'scores.log'))),
         my_callbacks.ImageLogger(writer),
         tf_callbacks.TensorBoard(log_dir=run, write_graph=True, profile_batch=0, histogram_freq=1),

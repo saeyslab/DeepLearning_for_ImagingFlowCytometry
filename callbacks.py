@@ -27,10 +27,9 @@ class ReduceLROnPlateaWithWarmup(keras.callbacks.ReduceLROnPlateau):
         self.base_learning_rate = base_learning_rate
 
     def on_epoch_end(self, epoch, logs=None):
-        if epoch < warmup_length:
-            logs = logs or {}
-            logs['lr'] = self.warmup_coeff*self.base_learning_rate
-            keras.backend.set_value(self.model.optimizer.lr, self.warmup_coeff*self.base_learning_rate)
+        if epoch < self.warmup_length:
+            new_lr = self.warmup_coeff*self.base_learning_rate
+            keras.backend.set_value(self.model.optimizer.lr, new_lr)
         else:
             super().on_epoch_end(epoch, logs)
 
@@ -50,15 +49,15 @@ class AdamLRLogger(keras.callbacks.Callback):
         beta_1 = K.get_value(opt.beta_1)
         
         t = K.cast(iterations, K.floatx()) + 1
-        lr_t = lr * (K.sqrt(1. - K.pow(beta_2, t)) /
-                     (1. - K.pow(beta_1, t)))
+        lr_t = lr * (tf.sqrt(1. - tf.pow(beta_2, t)) /
+                     (1. - tf.pow(beta_1, t)))
 
         with context.eager_mode(), self.writer.as_default(), summary_ops_v2.always_record_summaries():
-            summary_ops_v2.scalar(
-                "adam_lr",
-                lr_t,
-                step=epoch
-            )
+            summary_ops_v2.scalar("adam/lr", lr_t, step=epoch)
+            summary_ops_v2.scalar("adam/beta1", beta_1, step=epoch)
+            summary_ops_v2.scalar("adam/beta2", beta_2, step=epoch)
+            summary_ops_v2.scalar("adam/iterations", iterations, step=epoch)
+            summary_ops_v2.scalar("adam/t", iterations, step=epoch)
 
 
 class CometLogger(keras.callbacks.Callback):
