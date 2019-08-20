@@ -56,9 +56,11 @@ def optimizer_map(key):
     }[key]
 
 
-def load_model(args):
+def load_model(args, load_weights=True):
     m = model_map(args["model"])(args)
-    m.load_weights(args["model_hdf5"])
+
+    if load_weights:
+        m.load_weights(args["model_hdf5"])
 
     return m
 

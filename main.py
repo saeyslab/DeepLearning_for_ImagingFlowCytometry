@@ -8,7 +8,7 @@ import functions.cv
 import functions.embed
 import functions.tb_embed
 import functions.predict
-import functions.eval
+import functions.eval_cv
 import pandas as pd
 import sys
 import json
@@ -147,8 +147,8 @@ def main():
     def tb_embed():
         functions.tb_embed.run(args, meta)
 
-    def evaluate():
-        functions.eval.run(args, meta)
+    def evaluate_cv():
+        functions.eval_cv.run(args, meta)
     
 
     function_map = {
@@ -159,7 +159,7 @@ def main():
         "param": param,
         "embed": embed,
         "tb_embed": tb_embed,
-        "eval": evaluate
+        "eval_cv": evaluate_cv
     }
     
     function_map[args["function"]]()

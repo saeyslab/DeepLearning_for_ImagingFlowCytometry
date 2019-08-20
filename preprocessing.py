@@ -41,11 +41,22 @@ class generator:
 
 
 class pred_generator:
-    def __init__(self, data):
+    def __init__(self, data, indices=None):
         self.data = data
 
+        if indices is not None:
+            self.it = indices
+        else:
+            self.it = range(self.data.images.shape[1])
+
+    def __len__(self):
+        try:
+            return len(self.it)
+        except:
+            return self.data.images.shape[1]
+
     def __call__(self):
-        for idx in range(self.data.images.shape[1]):
+        for idx in self.it:
             yield self.data.images[:, idx, :, :]        
 
 
@@ -82,11 +93,11 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
             )
             ds_length = len(indices)
         else:
-            X = pred_generator(data)
+            X = pred_generator(data, indices)
             ds = tf.data.Dataset.from_generator(
                 X, output_types=tf.float32
             )
-            ds_length = data.images.shape[1]
+            ds_length = len(X)
 
         ds = ds.batch(batch_size=args["batch_size"])
         ds = ds.prefetch(16)
