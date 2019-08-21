@@ -58,6 +58,7 @@ def get_args():
             "es_epsilon",
             "lrplat_patience",
             "lrplat_epsilon",
+            "lrplat_factor",
             "beta1",
             "epsilon",
             "skip_n_folds",

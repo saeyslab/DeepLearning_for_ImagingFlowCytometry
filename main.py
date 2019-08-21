@@ -78,7 +78,7 @@ def make_callbacks(args, experiment=None, run=None):
         ),
         my_callbacks.ReduceLROnPlateauWithWarmup(
             monitor="val_balanced_accuracy", min_delta=args["lrplat_epsilon"],
-            factor=0.5, patience=int(args["lrplat_patience"]),
+            factor=args["lrplat_factor"], patience=int(args["lrplat_patience"]),
             base_learning_rate=args["learning_rate"],
             warmup_length=args["warmup_length"],
             warmup_coeff=args["warmup_coeff"]
