@@ -37,7 +37,8 @@ def run(args, meta):
         results["pred"][int(d.parts[-1])] = preds
         results["true"][int(d.parts[-1])] = labels[val_idx]
 
-    with open("predictions.pkl", "wb") as pkl:
+    out_dir = Path(args["model_hdf5"].parts[:-2])
+    with open(str(Path(out_dir, "predictions.pkl")), "wb") as pkl:
         pickle.dump(results, pkl)
 
 
