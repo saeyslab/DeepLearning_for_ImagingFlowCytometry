@@ -19,7 +19,8 @@ class ReduceLROnPlateauWithWarmup(keras.callbacks.ReduceLROnPlateau):
             monitor=monitor, 
             min_delta=min_delta,
             factor=factor,
-            patience=patience
+            patience=patience,
+            mode="max"
         )
 
         self.warmup_length = warmup_length
@@ -32,6 +33,7 @@ class ReduceLROnPlateauWithWarmup(keras.callbacks.ReduceLROnPlateau):
             keras.backend.set_value(self.model.optimizer.lr, new_lr)
         if epoch == self.warmup_length:
             keras.backend.set_value(self.model.optimizer.lr, self.base_learning_rate)
+            super()._reset()
             super().on_epoch_end(epoch, logs)
         else:
             super().on_epoch_end(epoch, logs)
