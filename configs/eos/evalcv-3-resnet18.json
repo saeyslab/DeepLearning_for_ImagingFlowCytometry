@@ -1,0 +1,14 @@
+{
+    "batch_size": 128,
+    "image_width": 90,
+    "image_height": 90,
+    "noc": 3,
+    "channels": [1, 6, 9],
+    "meta": "eos/ideas_s12.csv",
+    "split_dir": "eos_meta/s12_5fold",
+    "model": "resnet18",
+    "h5_data": "eos/s12.h5",
+    "l2": 0.0005,
+    "model_hdf5": "/home/maximl/scratch/results/eos/resnet18/cv-3-warmup/%d/best-model.hdf5"
+}
+
