@@ -21,6 +21,7 @@
     "beta1":0.9,
     "lrplat_patience": 5,
     "lrplat_epsilon": 0.01,
+    "lrplat_factor": 0.8,
     "warmup_length": 6,
     "warmup_coeff": 0.01
 }
