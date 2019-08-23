@@ -23,7 +23,7 @@
     "h5_data": "eos/s12.h5",
     "lrplat_patience": 5,
     "lrplat_epsilon": 0.01,
-    "lrplat_factor": 0.8,
+    "lrplat_factor": 0.6,
     "warmup_length": 6,
     "warmup_coeff": 0.01
 }
