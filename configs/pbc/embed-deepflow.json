@@ -1,5 +1,5 @@
 {
-    "model_hdf5": "/home/maximl/scratch/results/9-color/deepflow/cv-8-reduce-with-warmup-3/0/best-model.hdf5",
+    "model_hdf5": "/home/maximl/cp0293/scratch/results/9-color/deepflow/cv-8-reduce-with-warmup-3/0/best-model.hdf5",
     "split_dir": "9-color_meta/d34_5fold/0",
     "batch_size": 128,
     "channels": [1, 6, 9],
@@ -9,5 +9,7 @@
     "image_height": 90,
     "noc": 8,
     "augmentation": 0,
-    "layer": "dense"
+    "layer": "dense",
+    "l2": 0.00005,
+    "model": "deepflow"
 }

@@ -9,5 +9,6 @@
     "image_height": 90,
     "noc": 8,
     "augmentation": 0,
-    "layer": "flatten"
+    "layer": "flatten",
+    "model": "resnet18"
 }
