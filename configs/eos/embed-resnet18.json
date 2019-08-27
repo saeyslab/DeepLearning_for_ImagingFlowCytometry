@@ -1,6 +1,6 @@
 {
-    "model_hdf5": "eos/rn-best-model-fold-0-3chan.h5",
-    "split_dir": "eos_meta/s23_5fold_shuffled/0",
+    "model_hdf5": "/home/maximl/scratch/results/eos/resnet18/cv-3-reduce-with-warmup-2/0/best-model.hdf5",
+    "split_dir": "eos_meta/s12_5fold/0",
     "batch_size": 128,
     "channels": [1, 6, 9],
     "h5_data": "eos/s12.h5",
@@ -9,7 +9,6 @@
     "image_height": 90,
     "noc": 3,
     "augmentation": 0,
-    "embedding_output": "embedding_rn_s12_valfold0-3chan.pkl",
     "layer": "flatten",
-    "gpu_mem_fraction": 0.3
+    "model": "resnet18"
 }
