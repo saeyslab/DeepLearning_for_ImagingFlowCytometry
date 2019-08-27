@@ -17,7 +17,7 @@ def run(args, meta):
             for embedding in embedded_batch:
                 yield embedding
                 
-    m = model.load_model(args["model_hdf5"])
+    m = model.load_model(args)
     outputs = m.get_layer(args["layer"]).output
     embedder = models.Model(inputs=m.inputs, outputs=outputs)
 
