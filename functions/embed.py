@@ -26,6 +26,7 @@ def run(args, meta):
     idx = np.loadtxt(Path(args["split_dir"], "val.txt"), dtype=int)
     ds, ds_len = preprocessing.load_dataset(data, idx, meta["label"], args, type="val")
 
-    with open(args["embedding_output"], "wb") as pkl:
+    out_dir = Path(args["model_hdf5"]).parents[1]
+    with open(str(Path(out_dir, "embedding.pkl")), "wb") as pkl:
         for embedding in generator(embedder, ds, ds_len):
             pickle.dump(embedding, pkl)

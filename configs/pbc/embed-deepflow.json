@@ -1,6 +1,6 @@
 {
-    "model_hdf5": "9-color/df-best-model-fold-0.h5",
-    "split_dir": "9-color_meta/d23_5fold_shuffled/0",
+    "model_hdf5": "/home/maximl/scratch/results/9-color/deepflow/cv-8-reduce-with-warmup-3/0/best-model.hdf5",
+    "split_dir": "9-color_meta/d34_5fold/0",
     "batch_size": 128,
     "channels": [1, 6, 9],
     "h5_data": "9-color/earlyfix_d34.h5",
@@ -9,7 +9,5 @@
     "image_height": 90,
     "noc": 8,
     "augmentation": 0,
-    "embedding_output": "embedding_df_d34_valfold0.pkl",
-    "layer": "dense",
-    "gpu_mem_fraction": 0.3
+    "layer": "dense"
 }
