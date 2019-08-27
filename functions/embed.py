@@ -1,3 +1,4 @@
+from tensorflow.keras import models
 import preprocessing
 import numpy as np
 import pickle
@@ -16,9 +17,9 @@ def run(args, meta):
             for embedding in embedded_batch:
                 yield embedding
                 
-    model = model.load_model(args["model_hdf5"])
-    outputs = model.get_layer(args["layer"]).output
-    embedder = models.Model(inputs=model.inputs, outputs=outputs)
+    m = model.load_model(args["model_hdf5"])
+    outputs = m.get_layer(args["layer"]).output
+    embedder = models.Model(inputs=m.inputs, outputs=outputs)
 
     data = preprocessing.load_hdf5_to_memory(args, meta["label"])
 
