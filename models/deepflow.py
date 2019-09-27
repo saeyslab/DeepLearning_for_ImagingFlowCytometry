@@ -36,7 +36,7 @@ def deepflow(args):
 
             return keras.layers.Concatenate(axis=1)([conv1, pool1])
 
-    inp = keras.layers.Input(shape=(len(args["channels"]), args["image_width"], args["image_height"]))
+    inp = keras.layers.Input(shape=(len(args["channels"])-1, args["image_width"], args["image_height"]))
 
     with tf.name_scope("Top") as scope:
         conv1 = keras.layers.Conv2D(
