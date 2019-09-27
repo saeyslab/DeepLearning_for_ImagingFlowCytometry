@@ -37,7 +37,9 @@ class generator:
         if self.shuffle:
             np.random.shuffle(self.indices) # shuffle happens in-place
         for idx in self.indices:
-            yield self.data.images[:, idx, :, :], self.data.labels[idx]
+            yield self.data.images[[0,1], idx, :, :], self.data.labels[idx]
+        for idx in self.indices:
+            yield self.data.images[[2,1], idx, :, :], self.data.labels[idx]
 
 
 class pred_generator:
@@ -57,7 +59,7 @@ class pred_generator:
 
     def __call__(self):
         for idx in self.it:
-            yield self.data.images[:, idx, :, :]        
+            yield self.data.images[[0,1], idx, :, :]        
 
 
 def preprocess_batch(batch, aug):
@@ -86,7 +88,7 @@ def load_dataset(data, indices, labels, args, type="train", augment_func = None)
             ds = ds.map(lambda images, labels: (preprocess_batch(images, augment_func), labels), num_parallel_calls=4)
         ds = ds.prefetch(16)
 
-        ds_length = len(indices)
+        ds_length = len(indices)*2
     elif (type=="val") or (type=="pred"):
         if type =="val":
             X = generator(data, indices, shuffle=False)
