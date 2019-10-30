@@ -5,10 +5,10 @@ import pickle
 from pathlib import Path
 import model
 
-def run(args, meta):
+def run(args):
 
     def generator(embedder, ds, ds_len):
-        for i, (im_batch, _) in enumerate(iter(ds)):
+        for i, im_batch in enumerate(iter(ds)):
             if i % 100==0:
                 print("Batch %d" % i)
 
@@ -21,10 +21,9 @@ def run(args, meta):
     outputs = m.get_layer(args["layer"]).output
     embedder = models.Model(inputs=m.inputs, outputs=outputs)
 
-    data = preprocessing.load_hdf5_to_memory(args, meta["label"])
+    data = preprocessing.load_hdf5_to_memory(args, None)
 
-    idx = np.loadtxt(Path(args["split_dir"], "val.txt"), dtype=int)
-    ds, ds_len = preprocessing.load_dataset(data, idx, meta["label"], args, type="val")
+    ds, ds_len = preprocessing.load_dataset(data, None, None, args, type="pred")
 
     out_dir = Path(args["model_hdf5"]).parent
     with open(str(Path(out_dir, "embedding.pkl")), "wb") as pkl:

@@ -118,7 +118,8 @@ def main():
 
     tf.keras.backend.set_image_data_format("channels_first")
 
-    meta = pd.read_csv(args["meta"])
+    if "meta" in args:
+        meta = pd.read_csv(args["meta"])
         
     def summary():
         m = model.model_map(args["model"])(args)
@@ -145,7 +146,7 @@ def main():
         functions.param.run(args, meta)
 
     def embed():
-        functions.embed.run(args, meta)
+        functions.embed.run(args)
 
     def tb_embed():
         functions.tb_embed.run(args, meta)
