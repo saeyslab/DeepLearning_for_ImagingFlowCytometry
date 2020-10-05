@@ -1,6 +1,6 @@
 # Deep Learning for Imaging Flow Cytometry
 
-This repository contains the code used to generate results for "Include link to paper". A framework around Tensorflow-Keras is provided that makes it easy to train and evaluate any deep learning architecture on imaging flow cytometry data.
+This repository contains the code used to generate results for [Classification of Human White Blood Cells Using Machine Learning for Stain‐Free Imaging Flow Cytometry](https://doi.org/10.1002/cyto.a.23920). A framework around Tensorflow-Keras is provided that makes it easy to train and evaluate any deep learning architecture on imaging flow cytometry data.
 
 ## Citation
 If you use this package please cite the following publication:
