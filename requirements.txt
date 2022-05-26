@@ -54,7 +54,7 @@ tensorboard==1.13.1
 tensorflow==1.13.1
 tensorflow-addons==0.4.0
 tensorflow-estimator==1.13.0
-tensorflow-gpu==2.0.0b1
+tensorflow-gpu==2.7.2
 termcolor==1.1.0
 tf-estimator-nightly==1.14.0.dev2019060501
 tqdm==4.32.1
